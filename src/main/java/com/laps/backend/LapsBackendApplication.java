@@ -20,6 +20,8 @@ public class LapsBackendApplication {
 			User user = new User();
 			user.setUsername("testuser@gmail.com");
 			user.setPassword("password123");
+			user.setName("Test User");
+			user.setRole("Admin");
 			userRepository.save(user);
 		};
 	}

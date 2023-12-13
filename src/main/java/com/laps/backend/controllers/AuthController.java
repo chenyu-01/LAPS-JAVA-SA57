@@ -3,19 +3,19 @@ package com.laps.backend.controllers;
 import com.laps.backend.models.User;
 import com.laps.backend.services.UserServiceImpl;
 
+import jakarta.servlet.http.Cookie;
+import jakarta.servlet.http.HttpServletRequest;
 import org.springframework.http.HttpHeaders;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseCookie;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 import java.util.*;
 
 @RestController
 @RequestMapping("/api")
-public class LoginController {
+public class AuthController {
     private UserServiceImpl userService;
 
     @PostMapping("/login")
@@ -39,5 +39,26 @@ public class LoginController {
         return ResponseEntity.ok()
                 .header(HttpHeaders.SET_COOKIE, authCookie.toString())
                 .body(user);
+    }
+
+    @GetMapping("/check-auth")
+    public ResponseEntity<?> checkAuthentication(HttpServletRequest request) {
+        // Get the "auth_token" cookie from the request
+        Cookie[] cookies = request.getCookies();
+        if (cookies != null) {
+            for (Cookie cookie : cookies) {
+                if ("auth_token".equals(cookie.getName())) {
+                    // Check if the cookie value is valid (e.g., matches a user session)
+                    String username = cookie.getValue();
+                    User user = userService.findByUsername(username);
+                    if (user != null) {
+                        // User is authenticated
+                        return ResponseEntity.ok(user);
+                    }
+                }
+            }
+        }
+        // If the cookie is not present or invalid, return an unauthorized response
+        return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("Unauthorized");
     }
 }
