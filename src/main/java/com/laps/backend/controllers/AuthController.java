@@ -1,5 +1,6 @@
 package com.laps.backend.controllers;
 
+import com.fasterxml.jackson.databind.util.JSONPObject;
 import com.laps.backend.models.User;
 import com.laps.backend.models.UserDTO;
 import com.laps.backend.services.UserServiceImpl;
@@ -25,18 +26,19 @@ public class AuthController {
     }
 
     @PostMapping("/login")
-    public ResponseEntity<?> login(@RequestBody Map<String, String> credentials, HttpSession sessionObj) {
+    public ResponseEntity<?> login(@RequestBody Map<String, String> credentials, HttpSession session) {
         String username = credentials.get("username");
         String password = credentials.get("password");
 
         // ... handle login
         User user = userService.findByUsername(username);
-
         if (user == null || !user.getPassword().equals(password)){
             return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("Invalid username or password");
         }
-        sessionObj.setAttribute("user", user);
+
         UserDTO userDTO = new UserDTO(user);
+        session.setAttribute("user", userDTO);
+
         // Create a cookie
         ResponseCookie authCookie = ResponseCookie.from("auth_token", username)
                 .httpOnly(true)
@@ -51,38 +53,38 @@ public class AuthController {
     }
 
     @GetMapping("/check-auth")
-    public ResponseEntity<?> checkAuthentication(HttpServletRequest request, HttpSession sessionObj) {
+    public ResponseEntity<?> checkAuthentication(HttpServletRequest request, HttpSession session) {
         // Get the "auth_token" cookie from the request
+        UserDTO userDTO = (UserDTO) session.getAttribute("user");
         Cookie[] cookies = request.getCookies();
-        if (cookies != null) {
-            for (Cookie cookie : cookies) {
-                if ("auth_token".equals(cookie.getName())) {
-                    // Check if the cookie value is valid (e.g., matches a user session)
-                    String username = cookie.getValue();
-                    if (sessionObj.getAttribute("user") != null) {
-                        User user = (User) sessionObj.getAttribute("user");
-                        if (user.getUsername().equals(username)) {
-                            // User is authenticated
-                            return ResponseEntity.ok(new UserDTO(user));
-                        }
-                    }
-                }
-            }
+       if (cookies != null && userDTO != null) {
+           for (Cookie cookie : cookies) {
+               if (cookie.getName().equals("auth_token")) {
+                   String username = cookie.getValue();
+                   if (userDTO.getUsername().equals(username)) {
+                       return ResponseEntity.ok(userDTO);
+                   }
+               }
+           }
         }
         // If the cookie is not present or invalid, return an unauthorized response
-        return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("Unauthorized");
-    }
-
-    @PostMapping("/logout")
-    public ResponseEntity<?> logout() {
-        // Create a cookie
         ResponseCookie authCookie = ResponseCookie.from("auth_token", "")
                 .httpOnly(true)
                 .path("/")
                 .maxAge(0) // expires now
                 .build();
-
-        // Return the response entity with the cookie
+        return ResponseEntity.status(HttpStatus.UNAUTHORIZED)
+                .header(HttpHeaders.SET_COOKIE, authCookie.toString())
+                .body("Unauthorized");
+    }
+    @PostMapping("/logout")
+    public ResponseEntity<?> logout(HttpSession session) {
+        session.invalidate();
+        ResponseCookie authCookie = ResponseCookie.from("auth_token", "")
+                .httpOnly(true)
+                .path("/")
+                .maxAge(0) // expires now
+                .build();
         return ResponseEntity.ok()
                 .header(HttpHeaders.SET_COOKIE, authCookie.toString())
                 .body("Logged out");
