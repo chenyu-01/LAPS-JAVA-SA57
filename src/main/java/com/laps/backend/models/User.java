@@ -1,5 +1,6 @@
 package com.laps.backend.models;
 import jakarta.persistence.*;
+import jakarta.validation.constraints.Pattern;
 
 @Entity
 @Table(name = "app_user")
@@ -8,10 +9,11 @@ public class User {
     @GeneratedValue(strategy = GenerationType.AUTO)
     private Long id;
     // mandatory for name, role, username, password
-//    @Column(nullable = false)
+    @Column(nullable = false)
     private String name;
-//    @Column(nullable = false)
-    private String role; // e.g., Employee, Manager, Admin
+    @Pattern(regexp = "Employee|Manager|Admin")
+    @Column(nullable = false)
+    private String role; // e.g., Employee, Manager, Admin, only 3 roles
     @Column(nullable = false)
     private String username;
     @Column(nullable = false)
@@ -38,6 +40,10 @@ public class User {
 
     public String getPassword() {
         return password;
+    }
+
+    public void setName(String name) {
+        this.name = name;
     }
 
     public void setRole(String role) {
