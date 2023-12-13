@@ -5,8 +5,14 @@ import com.laps.backend.repositories.UserRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
-public interface UserService {
+@Service
+public class UserServiceImpl implements UserService {
 
-    // Methods for handling users
-    User findByUsername(String username);
+    @Autowired
+    private UserRepository repository;
+
+    @Override
+    public User findByUsername(String username) {
+        return repository.findByUsername(username);
+    }
 }
