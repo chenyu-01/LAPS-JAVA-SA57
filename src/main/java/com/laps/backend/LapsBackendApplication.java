@@ -14,13 +14,13 @@ public class LapsBackendApplication {
 	public static void main(String[] args) {
 		SpringApplication.run(LapsBackendApplication.class, args);
 	}
-//	@Bean
-//	CommandLineRunner initDatabase(UserRepository userRepository) {
-//		return args -> {
-//			User user = new User();
-//			user.setUsername("testuser@gmail.com");
-//			user.setPassword("password123");
-//			userRepository.save(user);
-//		};
-//	}
+	@Bean
+	CommandLineRunner initDatabase(UserRepository userRepository) {
+		return args -> {
+			User user = new User();
+			user.setUsername("testuser@gmail.com");
+			user.setPassword("password123");
+			userRepository.save(user);
+		};
+	}
 }
