@@ -1,5 +1,6 @@
 package com.laps.backend.models;
 import jakarta.persistence.*;
+import jakarta.validation.constraints.Email;
 import jakarta.validation.constraints.Pattern;
 
 @Entity
@@ -14,8 +15,10 @@ public class User {
     @Pattern(regexp = "Employee|Manager|Admin")
     @Column(nullable = false)
     private String role; // e.g., Employee, Manager, Admin, only 3 roles
-    @Column(nullable = false)
-    private String username;
+
+    @Email
+    @Column(nullable = false, unique = true)
+    private String email; // unique email address
     @Column(nullable = false)
     private String password;
 
@@ -34,8 +37,8 @@ public class User {
         return role;
     }
 
-    public String getUsername() {
-        return username;
+    public String getEmail() {
+        return email;
     }
 
     public String getPassword() {
@@ -50,8 +53,8 @@ public class User {
         this.role = role;
     }
 
-    public void setUsername(String username) {
-        this.username = username;
+    public void setEmail(String username) {
+        this.email = username;
     }
 
     public void setPassword(String password) {

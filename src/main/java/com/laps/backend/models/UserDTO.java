@@ -12,14 +12,14 @@ public class UserDTO implements Serializable { // Data Transfer Object
     @Getter @Setter
     private String role;
     @Getter @Setter
-    private String username;
+    private String email;
     // No password field
 
     // Constructors
     public UserDTO(User other) {
         this.name = other.getName();
         this.role = other.getRole();
-        this.username = other.getUsername();
+        this.email = other.getEmail();
     }
 
 
