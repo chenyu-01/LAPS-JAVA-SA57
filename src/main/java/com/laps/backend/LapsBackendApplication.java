@@ -18,7 +18,7 @@ public class LapsBackendApplication {
 	CommandLineRunner initDatabase(UserRepository userRepository) {
 		return args -> {
 			User user = new User();
-			user.setUsername("testuser@gmail.com");
+			user.setEmail("testuser@gmail.com");
 			user.setPassword("password123");
 			user.setName("Test User");
 			user.setRole("Admin");

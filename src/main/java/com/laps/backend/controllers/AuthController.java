@@ -22,11 +22,11 @@ public class AuthController {
 
     @PostMapping("/login")
     public ResponseEntity<?> login(@RequestBody Map<String, String> credentials, HttpSession session) {
-        String username = credentials.get("username");
+        String email = credentials.get("email");
         String password = credentials.get("password");
 
         // ... handle login
-        User user = userService.findByUsername(username);
+        User user = userService.findByEmail(email);
         if (user == null || !user.getPassword().equals(password)){
             return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("Invalid username or password");
         }
@@ -58,15 +58,14 @@ public class AuthController {
     }
 
     @PostMapping("/register")
-    public ResponseEntity<?> register(@RequestBody User user, HttpSession session) {
+    public ResponseEntity<?> register(@RequestBody User user) {
         // ... handle registration
-        User existingUser = userService.findByUsername(user.getUsername());
+        User existingUser = userService.findByEmail(user.getEmail());
         if (existingUser != null) {
             return ResponseEntity.status(HttpStatus.CONFLICT).body("Username already exists");
         }
         userService.save(user);
         UserDTO userDTO = new UserDTO(user);
-        session.setAttribute("user", userDTO);
         return ResponseEntity.ok(userDTO);
     }
 }
