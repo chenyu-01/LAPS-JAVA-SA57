@@ -9,4 +9,5 @@ public interface UserService {
 
     // Methods for handling users
     User findByUsername(String username);
+    void save(User user);
 }
