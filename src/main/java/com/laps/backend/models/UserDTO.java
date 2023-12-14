@@ -6,12 +6,10 @@ import lombok.Setter;
 import java.io.Serializable;
 
 
+@Getter @Setter
 public class UserDTO implements Serializable { // Data Transfer Object
-    @Getter @Setter
     private String name;
-    @Getter @Setter
     private String role;
-    @Getter @Setter
     private String email;
     // No password field
 
