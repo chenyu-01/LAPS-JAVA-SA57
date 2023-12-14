@@ -19,7 +19,7 @@ public class LapsBackendApplication {
 		return args -> {
 			User user = new User();
 			user.setEmail("testuser@gmail.com");
-			user.setPassword("password123");
+			user.setPassword("yYjHDp)d~+]Pb6");
 			user.setName("Test User");
 			user.setRole("Admin");
 			userRepository.save(user);
