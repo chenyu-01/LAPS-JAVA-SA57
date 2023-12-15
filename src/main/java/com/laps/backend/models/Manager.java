@@ -6,10 +6,5 @@ import lombok.Setter;
 
 @Entity
 @Getter @Setter
-public class Admin extends User {
-    public Admin() {
-        super();
-    }
-
-
+public class Manager extends Employee{
 }
