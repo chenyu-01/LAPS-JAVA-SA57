@@ -11,4 +11,10 @@ public class WebAppController {
     public String redirect() {
         return "forward:/";
     }
+
+    // Redirect /test to /dashboard
+    @RequestMapping(value = "/test")
+    public String test() {
+        return "Test";
+    }
 }
