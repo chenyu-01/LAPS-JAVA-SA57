@@ -17,4 +17,9 @@ public class WebAppController {
     public String test() {
         return "Test";
     }
+
+    @RequestMapping(value = "/leave")
+    public String leave() {
+        return "LeaveApplicationSubmit";
+    }
 }
