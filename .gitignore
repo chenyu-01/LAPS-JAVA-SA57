@@ -191,3 +191,12 @@ target
 .gradle
 README.html
 .exercism
+
+# Node modules and dependencies
+node_modules/
+npm-debug.log
+package-lock.json
+
+# Optional: Ignore environment-specific files
+.env
+.env.local
