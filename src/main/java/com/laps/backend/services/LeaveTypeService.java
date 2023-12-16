@@ -5,9 +5,8 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 @Service
-public class LeaveTypeService {
-    @Autowired
-    private LeaveTypeRepository leaveTypeRepository;
+public interface LeaveTypeService {
+  
 
     // Methods for handling leave types
 }
