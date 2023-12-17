@@ -1,0 +1,21 @@
+{
+  "name": "laps-backend",
+  "description": "",
+  "version": "1.0.0",
+  "main": "tailwind.config.js",
+  "directories": {
+    "doc": "docs"
+  },
+  "devDependencies": {
+    "postcss-cli": "^11.0.0",
+    "prettier": "^3.1.1",
+    "tailwindcss": "^3.3.6"
+  },
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "watch:css": "tailwindcss -i src/main/resources/static/css/tailwind.css -o ./src/main/resources/static/css/styles.css --watch"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC"
+}
