@@ -1,6 +1,7 @@
 package com.laps.backend.models;
 
 import java.io.Serializable;
+import java.util.Objects;
 
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
@@ -9,12 +10,12 @@ import jakarta.persistence.Table;
 
 @Entity
 @Table(name = "role")
-public class Role implements Serializable {
-	private static final long serialversionUID = 6529685098267757690L;
+	public class Role implements Serializable {
+		private static final long serialversionUID = 6529685098267757690L;
 	
 	@Id
 	@Column(name = "roleid")
-	private int roleId;
+	private String roleId;
 	
 	@Column(name = "name")
 	private String name;
@@ -24,16 +25,21 @@ public class Role implements Serializable {
 	
 	public Role() {}
 	
-	public Role(String name,String description) {
+  public Role(String roleId) {
+	    this.roleId = roleId;
+	  }
+	
+	public Role(String roleId, String name,String description) {
+		this.roleId = roleId;
 		this.name = name;
 		this.description = description;
 	}
 
-	public int getRoleId() {
+	public String getRoleId() {
 		return roleId;
 	}
 
-	public void setRoleId(int roleId) {
+	public void setRoleId(String roleId) {
 		this.roleId = roleId;
 	}
 
@@ -52,6 +58,22 @@ public class Role implements Serializable {
 	public void setDescription(String description) {
 		this.description = description;
 	}
-	
+		
+	  @Override
+	  public int hashCode() {
+	    return Objects.hash(roleId);
+	  }
+
+	  @Override
+	  public boolean equals(Object obj) {
+	    if (this == obj)
+	      return true;
+	    if (obj == null)
+	      return false;
+	    if (getClass() != obj.getClass())
+	      return false;
+	    Role other = (Role) obj;
+	    return Objects.equals(roleId, other.roleId);
+	  }
 
 }

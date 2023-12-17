@@ -1,6 +1,7 @@
 package com.laps.backend.services;
 
 import java.util.List;
+import java.util.Optional;
 
 import org.springframework.stereotype.Service;
 
@@ -14,6 +15,16 @@ public interface RoleService {
 
 	List<Role> findAllRoles();
 
-	void createRole(@Valid Role role);
+	Role createRole(@Valid Role role);
+
+	Optional<Role> findRole(String id);
+
+	@Valid Role changeRole(@Valid Role role);
+
+	void removeRole(Optional<Role> role);
+
+	List<Role> findRoleByName(String name);
+
+	List<String> findAllRolesNames();
 
 }
