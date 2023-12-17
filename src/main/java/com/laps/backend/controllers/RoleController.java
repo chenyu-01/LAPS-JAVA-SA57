@@ -83,7 +83,7 @@ public class RoleController {
 		}
 		
 		String message = "Role was succesfully updated";
-		System.out.println("Role successfully updated");
+		System.out.println(message);
 		roleService.changeRole(role);
 		
 		return "redirect:/admin/role/list";

@@ -1,0 +1,29 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+
+<head th:replace=="fragments/layout.html :: html_head" />
+
+<body>
+  <div th:replace="fragments/layout.html :: menu" />
+  <div th:replace="fragments/layout.html :: header" />
+  <h3>LeaveType List Page</h3>
+
+  <div th:if="${not #lists.isEmpty(leaveTypeList)}">
+    <table style="border: 1;">
+      <tr class="listHeading">
+        <th><span th:text="#{fieldLabel.leaveTypeId}"></span></th>
+        <th><span th:text="#{fieldLabel.leaveTypeRoleName}"></span></th>
+        <th><span th:text="#{fieldLabel.leaveTypeName}"></span></th>
+        <th><span th:text="#{fieldLabel.leaveTypeentitledNum}"></span></th>
+        <th><span th:text="#{caption.edit}"></span></th>
+      </tr>
+      <tr th:each="leaveType : ${leaveTypeList}" class="listRecord">
+        <td align="left" th:text="${leaveType.Id}">Id</td>
+        <td align="left" th:text="${leaveType.roleName}">Role</td>
+        <td align="left" th:text="${leaveType.name}">Name</td>
+        <td align="left" th:text="${leaveType.entitledNum}">Number of Days</td>
+        <td><a th:href="@{/leavetype/editDetails/}+${leaveType.Id}" class="btn btn-default">
+                <span th:text="#{caption.edit}"></span></a></td>
+      </tr>
+    </table>
+  </div>
