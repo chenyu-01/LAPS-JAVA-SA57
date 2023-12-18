@@ -1,11 +1,13 @@
 package com.laps.backend.controllers;
 
 import com.laps.backend.models.User;
+import com.laps.backend.models.UserDTO;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import com.laps.backend.services.AdminServiceImpl;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 
@@ -19,13 +21,17 @@ private final AdminServiceImpl adminService;
     }
 
     @GetMapping("/users")
-    public ResponseEntity<List<User>> getAllUsers() {
+    public ResponseEntity<List<UserDTO>> getAllUsers() {
         List<User> users = adminService.getAllUsers();
         if (users.isEmpty()) {
-            //return ResponseEntity.noContent().build(); // 没有内容时返回 204 No Content
-            return ResponseEntity.ok(users);
+            return ResponseEntity.noContent().build(); // 没有内容时返回 204 No Content
+
         }
-        return ResponseEntity.ok(users);
+        List<UserDTO> userDTOS = new ArrayList<>();
+        for (User user : users) {
+            userDTOS.add(new UserDTO(user));
+        }
+        return ResponseEntity.ok(userDTOS);
     }
 
     @GetMapping("/{id}")
