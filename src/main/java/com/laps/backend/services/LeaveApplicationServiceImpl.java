@@ -6,7 +6,7 @@ import org.springframework.stereotype.Service;
 import jakarta.annotation.Resource;
 
 @Service
-public class LeaveApplicationServiceImpl implements LeaveApplicationService{
+public class LeaveApplicationServiceImpl{
     @Autowired
     private LeaveApplicationRepository leaveApplicationRepository;
 }

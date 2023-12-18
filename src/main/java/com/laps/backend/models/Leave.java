@@ -2,10 +2,6 @@ package com.laps.backend.models;
 import java.time.LocalDate;
 
 import jakarta.persistence.*;
-import jakarta.validation.constraints.Pattern;
-import lombok.AccessLevel;
-import lombok.Getter;
-import lombok.Setter;
 
 @Entity
 public class Leave {
@@ -19,8 +15,6 @@ public class Leave {
     private LocalDate startDate;
     
     private LocalDate endDate;
-    
-    private LeaveStatus status;
     
 
     public Long getId() {
@@ -46,12 +40,6 @@ public class Leave {
 	}
 	public void setEndDate(LocalDate endDate) {
 		this.endDate = endDate;
-	}
-	public LeaveStatus getStatus() {
-		return status;
-	}
-	public void setStatus(LeaveStatus status) {
-		this.status = status;
 	}
 	public String getName() {
 		return name;
