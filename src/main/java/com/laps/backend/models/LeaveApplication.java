@@ -17,7 +17,6 @@ import java.util.Date;
 public class LeaveApplication {
     @Id
     @Setter(AccessLevel.NONE) // disable setter for id
-    //@Getter(AccessLevel.NONE) // disable getter for id
     @GeneratedValue(strategy = GenerationType.AUTO)
     private Long id;
     private Date startDate;
