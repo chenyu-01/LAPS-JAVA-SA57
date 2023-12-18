@@ -1,29 +1,58 @@
 <!DOCTYPE html>
-<html xmlns:th="http://www.thymeleaf.org">
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
 
 <head th:replace=="fragments/layout.html :: html_head" />
 
-<body>
-  <div th:replace="fragments/layout.html :: menu" />
-  <div th:replace="fragments/layout.html :: header" />
-  <h3>LeaveType List Page</h3>
+<head>
+	<meta charset="UTF-8">
+	<meta name="viewport" content="width=device-width, initial-scale=1.0">
+	<title>Leave Type List Page</title>
+	<link th:href="@{css/styles.css}" rel="stylesheet" type="text/css" />
+</head>
 
-  <div th:if="${not #lists.isEmpty(leaveTypeList)}">
-    <table style="border: 1;">
-      <tr class="listHeading">
-        <th><span th:text="#{fieldLabel.leaveTypeId}"></span></th>
-        <th><span th:text="#{fieldLabel.leaveTypeRoleName}"></span></th>
-        <th><span th:text="#{fieldLabel.leaveTypeName}"></span></th>
-        <th><span th:text="#{fieldLabel.leaveTypeentitledNum}"></span></th>
-        <th><span th:text="#{caption.edit}"></span></th>
-      </tr>
-      <tr th:each="leaveType : ${leaveTypeList}" class="listRecord">
-        <td align="left" th:text="${leaveType.Id}">Id</td>
-        <td align="left" th:text="${leaveType.roleName}">Role</td>
-        <td align="left" th:text="${leaveType.name}">Name</td>
-        <td align="left" th:text="${leaveType.entitledNum}">Number of Days</td>
-        <td><a th:href="@{/leavetype/editDetails/}+${leaveType.Id}" class="btn btn-default">
-                <span th:text="#{caption.edit}"></span></a></td>
-      </tr>
-    </table>
-  </div>
+<body>
+	<div th:replace="fragments/layout.html :: menu" />
+	<div th:replace="fragments/layout.html :: header" />
+	<td th:if="${not #lists.isEmpty(leaveTypeList)}">
+		<table class="table">
+			<div
+				class="items-stretch self-stretch rounded border shadow-sm bg-white flex max-w-[496px] flex-col border-solid border-zinc-600">
+				<thead>
+					<tr
+						class="items-stretch bg-white flex gap-0 px-5 max-md:max-w-full max-md:flex-wrap max-md:justify-center">
+						<th class="text-teal-400 text-xs font-semibold leading-4 whitespace-nowrap items-stretch bg-white bg-opacity-10 aspect-[1.6388888888888888] justify-center px-3 py-2.5 border-l-zinc-600 border-t-zinc-600 border-t border-solid border-l"
+							th:text="#{fieldLabel.leaveTypeId}"></th>
+						<th class="text-teal-400 text-xs font-semibold leading-4 whitespace-nowrap items-stretch bg-white bg-opacity-10 grow justify-center px-3 py-2.5 border-l-zinc-600 border-t-zinc-600 border-t border-solid border-l"
+							th:text="#{fieldLabel.leaveTypeRoleName}"></th>
+						<th class="text-teal-400 text-xs font-semibold leading-4 whitespace-nowrap items-stretch bg-white bg-opacity-10 grow justify-center px-3 py-2.5 border-l-zinc-600 border-t-zinc-600 border-t border-solid border-l"
+							th:text="#{fieldLabel.leaveTypeName}"></th>
+						<th class="text-teal-400 text-xs font-semibold leading-4 whitespace-nowrap items-stretch bg-white bg-opacity-10 grow justify-center px-3 py-2.5 border-l-zinc-600 border-t-zinc-600 border-t border-solid border-l"
+							th:text="#{fieldLabel.leaveTypeentitledNum}"></th>
+					</tr>
+				</thead>
+				<!-- Data Rows -->
+				<tbody>
+					<tr th:each="leaveType : ${leaveTypeList}"
+						class="items-stretch bg-white flex gap-0 px-5 max-md:max-w-full max-md:flex-wrap max-md:justify-center">
+						<td class="text-stone-900 text-xs leading-4 whitespace-nowrap items-stretch bg-white bg-opacity-0 aspect-[1.6388888888888888] justify-center px-3 py-2.5 border-l-zinc-600 border-t-zinc-600 border-t border-solid border-l"
+							th:text="${leaveType.Id}"></td>
+						<td class="text-stone-900 text-xs leading-4 whitespace-nowrap items-stretch bg-white bg-opacity-0 grow justify-center px-3 py-2.5 border-l-zinc-600 border-t-zinc-600 border-t border-solid border-l"
+							th:text="${leaveType.roleName}"></td>
+						<td class="text-stone-900 text-xs leading-4 whitespace-nowrap items-stretch bg-white bg-opacity-0 grow justify-center px-3 py-2.5 border-l-zinc-600 border-t-zinc-600 border-t border-solid border-l"
+							th:text="${leaveType.name}"></td>
+						<td class="text-stone-900 text-xs leading-4 whitespace-nowrap items-stretch bg-white bg-opacity-0 grow justify-center px-3 py-2.5 border-l-zinc-600 border-t-zinc-600 border-t border-solid border-l"
+							th:text="${leaveType.entitledNum}"></td>
+						<td>
+							<a th:href="@{/leavetype/editDetails/}+${leaveType.Id}" class="btn btn-default">
+								<span th:text="#{caption.edit}"></span></a>
+						</td>
+					</tr>
+				</tbody>
+			</div>
+		</table>
+		<div th:if="${#lists.isEmpty(leaveTypeList)}">
+			<p>No leave types available.</p>
+		</div>
+</body>
+
+</html>
