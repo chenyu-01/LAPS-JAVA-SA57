@@ -13,10 +13,6 @@ import java.util.List;
 @Getter @Setter
 public class Manager extends Employee{
 
-    @ManyToOne
-    @JoinColumn(name = "manager_id", nullable = true)
-    private Manager manager;
-
     @OneToMany(mappedBy = "manager")
     private List<Employee> subordinates;
 }

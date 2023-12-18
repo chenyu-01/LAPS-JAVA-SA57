@@ -18,7 +18,7 @@ public class UserDTO implements Serializable { // Data Transfer Object
     public UserDTO(User other) {
         this.id = other.getId().toString();
         this.name = other.getName();
-        this.role = other.getRole();
+        this.role = other.getRole().toString();
         this.email = other.getEmail();
     }
 

@@ -18,9 +18,9 @@ public class User {
     // mandatory for name, role, username, password
     @Column(nullable = false)
     private String name;
-    @Pattern(regexp = "Employee|Manager|Admin", message = "Role must be Employee, Manager, or Admin")
+
     @Column(nullable = false)
-    private String role; // e.g., Employee, Manager, Admin, only 3 roles
+    private Role role; // e.g., Employee, Manager, Admin, only 3 roles
 
     @Email
     @Column(nullable = false, unique = true)
