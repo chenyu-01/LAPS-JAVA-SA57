@@ -9,9 +9,6 @@ public class Leave {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
     
-    @Enumerated(EnumType.STRING)
-    private LeaveType leavetype;
-    
     private LocalDate startDate;
     
     private LocalDate endDate;
@@ -22,12 +19,6 @@ public class Leave {
 	}
 	public void setId(Long id) {
 		this.id = id;
-	}
-	public LeaveType getLeavetype() {
-		return leavetype;
-	}
-	public void setLeavetype(LeaveType leavetype) {
-		this.leavetype = leavetype;
 	}
 	public LocalDate getStartDate() {
 		return startDate;
