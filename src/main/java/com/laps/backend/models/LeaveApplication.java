@@ -17,7 +17,7 @@ import java.util.Date;
 public class LeaveApplication {
     @Id
     @Setter(AccessLevel.NONE) // disable setter for id
-    @Getter(AccessLevel.NONE) // disable getter for id
+    //@Getter(AccessLevel.NONE) // disable getter for id
     @GeneratedValue(strategy = GenerationType.AUTO)
     private Long id;
     private Date startDate;
@@ -26,6 +26,7 @@ public class LeaveApplication {
     @Column(nullable = false)
     @Pattern(regexp = "Applied|Approved|Rejected|Deleted", message = "Status must be Applied, Approved, Rejected, or Deleted")
     private String status; // e.g., Applied, Approved, Rejected, Deleted
+    private String comment; // comment for the leave application
     private String reason; // Reason for the leave
 
     @ManyToOne
