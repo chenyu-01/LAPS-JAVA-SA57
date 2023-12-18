@@ -12,7 +12,7 @@ import lombok.Getter;
 public class User {
     @Id
     @GeneratedValue(strategy = GenerationType.AUTO)
-    @Getter(AccessLevel.NONE) // disable getter for id
+    //@Getter(AccessLevel.NONE) // disable getter for id
     @Setter(AccessLevel.NONE) // disable setter for id
     private Long id;
     // mandatory for name, role, username, password
