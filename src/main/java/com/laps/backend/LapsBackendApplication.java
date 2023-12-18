@@ -1,5 +1,6 @@
 package com.laps.backend;
 
+import com.laps.backend.models.Employee;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 
@@ -17,11 +18,11 @@ public class LapsBackendApplication {
 	@Bean
 	CommandLineRunner initDatabase(UserRepository userRepository) {
 		return args -> {
-			User user = new User();
+			User user = new Employee();
 			user.setEmail("testuser@gmail.com");
 			user.setPassword("yYjHDp)d~+]Pb6");
 			user.setName("Test User");
-			user.setRole("Admin");
+			user.setRole("Employee");
 			userRepository.save(user);
 		};
 	}
