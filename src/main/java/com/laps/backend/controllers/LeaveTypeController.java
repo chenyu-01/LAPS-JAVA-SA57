@@ -57,11 +57,8 @@ public class LeaveTypeController {
 	    	return "redirect:/leavetype/list";
 	    }
 	    
-	    System.out.println("debugging ****" + leaveType.getId() + " " + leaveType.getRoleName() +  " " + leaveType.getName() + " " + leaveType.getEntitledNum());
-	    System.out.println("debugging ****" + existingLeaveType.getId() + " " + existingLeaveType.getRoleName() +  " " + existingLeaveType.getName() + " " + existingLeaveType.getEntitledNum());
 	    // Update the existing LeaveType with the new data
 	    existingLeaveType.setEntitledNum(leaveType.getEntitledNum());
-		System.out.println("debugging ****" + existingLeaveType.getId() + " " + existingLeaveType.getRoleName() +  " " + existingLeaveType.getName() + " " + existingLeaveType.getEntitledNum());
 		String message = "LeaveType was succesfully updated";
 		System.out.println(message);
 		leaveTypeService.changeLeaveType(existingLeaveType);
