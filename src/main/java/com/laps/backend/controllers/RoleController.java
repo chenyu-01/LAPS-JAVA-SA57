@@ -44,63 +44,9 @@ public class RoleController {
 		return "role-list";
 	}
 	
-	@GetMapping("/create")
-	public String newRole(Model model) {
-		model.addAttribute("role", new Role());
-		
-		return "role-new";
-	}
 	
-	@PostMapping("/create")
-	public String createRole(@ModelAttribute @Valid Role role,BindingResult bindingresult) {
-		if(bindingresult.hasErrors()) {
-			return "role-new";
-		}
-		
-		String message = "New role successfully created";
-		System.out.println(message);
-		roleService.createRole(role);
-		
-		return "redirect:/admin/role/list";
-		
 	}
 	
 
-	@GetMapping("edit/{id}")
-	public String editRole(@PathVariable String id,Model model) {
-		
-		Optional<Role> role = roleService.findRole(id);
-		model.addAttribute("role", role.get());
-		
-		return "role-edit";
-	}
 	
-	@PostMapping("edit/{id}")
-	public String editRole(@ModelAttribute @Valid Role role, BindingResult bindingResult,
-			@PathVariable String id) throws RoleNotFound{
-		if (bindingResult.hasErrors()) {
-			return "role-edit";
-		}
-		
-		String message = "Role was succesfully updated";
-		System.out.println(message);
-		roleService.changeRole(role);
-		
-		return "redirect:/admin/role/list";
-		
-	}
-	
-	@GetMapping("/delete/{id}")
-	public String deleteRole(@PathVariable String id) throws RoleNotFound{
-		Optional<Role> role = roleService.findRole(id);
-		roleService.removeRole(role);
-		
-		String message = "The role was successfully deleted";
-		System.out.println(message);
-		
-		return "redirect:/admin/role/list";
-		
-		
-	}
-	
-}
+
