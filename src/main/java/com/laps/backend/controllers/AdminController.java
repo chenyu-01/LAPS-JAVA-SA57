@@ -24,7 +24,7 @@ private final AdminServiceImpl adminService;
     public ResponseEntity<List<UserDTO>> getAllUsers() {
         List<User> users = adminService.getAllUsers();
         if (users.isEmpty()) {
-            return ResponseEntity.noContent().build(); // 没有内容时返回 204 No Content
+            return ResponseEntity.noContent().build(); // 204 No Content
 
         }
         List<UserDTO> userDTOS = new ArrayList<>();
@@ -35,9 +35,13 @@ private final AdminServiceImpl adminService;
     }
 
     @GetMapping("/{id}")
-    public ResponseEntity<Optional<User>> getUserById(@PathVariable Long id) {
+    public ResponseEntity<Optional<UserDTO>> getUserById(@PathVariable Long id) {
         Optional<User> user = adminService.getUserById(id);
-        return ResponseEntity.ok(user);
+        if (user.isEmpty()) {
+            return ResponseEntity.noContent().build();
+        }
+        UserDTO userDTO = new UserDTO(user.get());
+        return ResponseEntity.ok(Optional.of(userDTO));
     }
 
 
