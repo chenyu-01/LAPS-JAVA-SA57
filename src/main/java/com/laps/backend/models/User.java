@@ -26,7 +26,6 @@ public class User {
     @Column(nullable = false, unique = true)
     private String email; // unique email address
     @Size(min = 8, max = 20)
-    @Pattern(regexp = "^(?=.*[a-z])(?=.*[A-Z])(?=.*\\d).*$", message = "Password must contain at least 1 uppercase letter, 1 lowercase letter, and 1 number")
     @Column(nullable = false)
     private String password;
 
