@@ -23,8 +23,8 @@ public class LeaveApplication {
     private Date endDate;
     private String type; // e.g., Annual, Medical, Compensation, etc.
     @Column(nullable = false)
-    @Pattern(regexp = "Applied|Approved|Rejected|Deleted", message = "Status must be Applied, Approved, Rejected, or Deleted")
-    private String status; // e.g., Applied, Approved, Rejected, Deleted
+    @Pattern(regexp = "Applied|Approved|Rejected|Deleted|Cancelled", message = "Status must be Applied, Approved, Rejected, or Deleted or Cancelled")
+    private String status; // e.g., Applied, Approved, Rejected, Deleted, Cancelled
     private String comment; // comment for the leave application
     private String reason; // Reason for the leave
 
