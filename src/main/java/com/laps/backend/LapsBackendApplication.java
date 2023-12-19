@@ -10,6 +10,9 @@ import org.springframework.context.annotation.Bean;
 import com.laps.backend.repositories.UserRepository;
 import com.laps.backend.repositories.RoleRepository;
 import com.laps.backend.repositories.LeaveTypeRepository;
+import com.laps.backend.repositories.PublicHolidayRepository;
+
+import java.time.LocalDate;
 import java.util.Date;
 
 @SpringBootApplication(exclude={SecurityAutoConfiguration.class})
@@ -21,7 +24,7 @@ public class LapsBackendApplication {
 
 	@Bean
 	CommandLineRunner initDatabase(UserRepository userRepository, RoleRepository rolerepository,
-			LeaveTypeRepository leaveTypeRepository, LeaveApplicationRepository leaveRepository) {
+			LeaveTypeRepository leaveTypeRepository, LeaveApplicationRepository leaveRepository,PublicHolidayRepository publicHolidayRepository) {
 
 		return args -> {
 
@@ -74,6 +77,31 @@ public class LapsBackendApplication {
 			user3.setName("Test User 3");
 			user3.setRole("Manager");
 			userRepository.save(user3);
+
+			PublicHolidays P1 = publicHolidayRepository
+					.save(new PublicHolidays(LocalDate.parse("2024-01-01"), "New Year"));
+			PublicHolidays P2 = publicHolidayRepository
+					.save(new PublicHolidays(LocalDate.parse("2024-02-10"), "Chinese New Year"));
+			PublicHolidays P3 = publicHolidayRepository
+					.save(new PublicHolidays(LocalDate.parse("2024-02-11"), "Chinese New Year"));
+			PublicHolidays P4 = publicHolidayRepository
+					.save(new PublicHolidays(LocalDate.parse("2024-02-12"), "Chinese New Year"));
+			PublicHolidays P5 = publicHolidayRepository
+					.save(new PublicHolidays(LocalDate.parse("2024-03-29"), "Good Friday"));
+			PublicHolidays P6 = publicHolidayRepository
+					.save(new PublicHolidays(LocalDate.parse("2024-04-10"), "Hari Raya Pusa"));
+			PublicHolidays P7 = publicHolidayRepository
+					.save(new PublicHolidays(LocalDate.parse("2024-05-01"), "Labour Day"));
+			PublicHolidays P8 = publicHolidayRepository
+					.save(new PublicHolidays(LocalDate.parse("2024-05-23"), "Vesak Day"));
+			PublicHolidays P9 = publicHolidayRepository
+					.save(new PublicHolidays(LocalDate.parse("2024-06-16"), "Hari Raya Haji"));
+			PublicHolidays P10 = publicHolidayRepository
+					.save(new PublicHolidays(LocalDate.parse("2024-07-09"), "Natioanl Day"));
+			PublicHolidays P11 = publicHolidayRepository
+					.save(new PublicHolidays(LocalDate.parse("2024-10-31"), "Deepavali "));
+			PublicHolidays P12 = publicHolidayRepository
+					.save(new PublicHolidays(LocalDate.parse("2023-12-25"), "Chirstmas Day"));
 
 		};
 	}

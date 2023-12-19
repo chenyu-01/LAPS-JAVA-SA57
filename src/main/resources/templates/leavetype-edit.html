@@ -14,31 +14,25 @@
 			<tbody>
 				<tr>
 					<td><span th:text="#{fieldLabel.leaveTypeId}"></span></td>
-					<td>
-						<fieldset><input type="text" th:field="*{Id}" readonly="readonly" /></fieldset>
-					</td>
-					<td th:if="${#fields.hasErrors('Id')}" th:errors="*{Id}"></td>
+					<td><input type="text" th:field="*{Id}" /></td>
 				</tr>
-					<tr>
+				<tr>
 					<td><span th:text="#{fieldLabel.leaveTypeName}"></span></td>
-					<td><input type="text" th:field="*{Name}" readonly="readonly"/></td>
-					<td th:if="${#fields.hasErrors('name')}" th:errors="*{name}"></td>
+					<td><input type="text" th:field="*{name}" /></td>
 				</tr>
 				<tr>
 					<td><span th:text="#{fieldLabel.leaveTypeRoleName}"></span></td>
-					<td><input type="text" th:field="*{roleName}" readonly="readonly" /></td>
-					<td th:if="${#fields.hasErrors('roleName')}" th:errors="*{roleName}"></td>
+					<td><input type="text" th:field="*{roleName}" /></td>
 				</tr>
-			
 				<tr>
 					<td><span th:text="#{fieldLabel.leaveTypeentitledNum}"></span></td>
 					<td><input type="text" th:field="*{entitledNum}" /></td>
-					<td th:if="${#fields.hasErrors('entitledNum')}" th:errors="*{entitledNum}"></td>
+					<td th:if="${#fields.hasErrors('entitledNum')}">
+						<span th:errors="*{entitledNum}"></span>
+					</td>
 				</tr>
 				<tr>
 					<td><input type="submit" value="Update" class="blcass" /></td>
-					<td></td>
-					<td></td>
 				</tr>
 			</tbody>
 		</table>
