@@ -1,5 +1,6 @@
 package com.laps.backend.services;
 
+import com.laps.backend.models.Employee;
 import com.laps.backend.models.LeaveApplication;
 import com.laps.backend.repositories.LeaveApplicationRepository;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -25,6 +26,11 @@ public class LeaveApplicationServiceImpl implements LeaveApplicationService{
     // 获取所有状态为 "Applied" 的申请
     public List<LeaveApplication> getAllAppliedApplications() {
         return leaveApplicationRepository.findByStatus("Applied");
+    }
+
+    @Override
+    public List<LeaveApplication> getAppliedApplicationsByEmployee(Employee employee) {
+        return leaveApplicationRepository.findByEmployee(employee);
     }
 
     @Override
