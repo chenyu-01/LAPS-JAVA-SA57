@@ -28,6 +28,8 @@ public class LeaveApplication {
     private String comment; // comment for the leave application
     private String reason; // Reason for the leave
 
+    private String contactInfo; // Contact information if overseas leave
+
     @ManyToOne
     @JoinColumn(name = "employee_id", nullable = false)
     private Employee employee; // Employee who applied for the leave
