@@ -10,6 +10,6 @@ public interface UserRepository extends JpaRepository<User, Long> {
     // Query methods for User
     List<User> findByName(String name);
 
-    List<User> findByRole(Role role);
+    List<User> findByRole(String role);
 }
 
