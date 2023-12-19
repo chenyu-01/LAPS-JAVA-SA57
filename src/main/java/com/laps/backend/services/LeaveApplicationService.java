@@ -1,8 +1,10 @@
 package com.laps.backend.services;
 
+import com.laps.backend.models.Employee;
 import com.laps.backend.models.LeaveApplication;
 
 import java.util.List;
+import java.util.Optional;
 
 public interface LeaveApplicationService {
 
@@ -16,4 +18,24 @@ public interface LeaveApplicationService {
     void rejectApplication(Long id);
 
     void addCommentToApplication(Long id, String comment);
+
+    Optional<LeaveApplication> findById(Long id,Long employee_id);
+    LeaveApplication saveApplication(LeaveApplication leaveApplication);
+
+    List<LeaveApplication> getAllApprovedApplications();
+
+    List<LeaveApplication> getAllRejectedApplications();
+
+
+    List<LeaveApplication> getAllDeletedApplications();
+
+
+    List<LeaveApplication> getAllCanceledApplications();
+
+
+    List<LeaveApplication> getAllUpdatedApplications();
+
+
+    Optional<Employee> findEmployeeById(Long id);
+
 }
