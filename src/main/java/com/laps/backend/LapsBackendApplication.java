@@ -24,14 +24,14 @@ public class LapsBackendApplication {
 			user3.setEmail("testuser3@gmail.com");
 			user3.setPassword("password123");
 			user3.setName("Test User 3");
-			user3.setRole(Role.Manager);
+			user3.setRole("Manager");
 			userRepository.save(user3);
 
 			User user = new Employee();
 			user.setEmail("testuser@gmail.com");
 			user.setPassword("yYjHDp)d~+]Pb6");
 			user.setName("Test User");
-			user.setRole(Role.Employee);
+			user.setRole("Employee");
 			((Employee) user).setManager((Manager) user3);
 			userRepository.save(user);
 
@@ -50,7 +50,7 @@ public class LapsBackendApplication {
 			user2.setEmail("testuser2@gmail.com");
 			user2.setPassword("password123");
 			user2.setName("Test User 2");
-			user2.setRole(Role.Admin);
+			user2.setRole("Admin");
 			userRepository.save(user2);
 
 
