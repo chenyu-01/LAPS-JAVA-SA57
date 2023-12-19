@@ -1,7 +1,6 @@
 package com.laps.backend.services;
 
 import com.laps.backend.models.Compensation;
-import com.laps.backend.models.Leavehistory;
 import com.laps.backend.repositories.CompensationReposity;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;

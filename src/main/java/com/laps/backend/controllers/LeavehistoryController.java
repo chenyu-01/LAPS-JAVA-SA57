@@ -1,6 +1,6 @@
 package com.laps.backend.controllers;
 
-import com.laps.backend.models.Leavehistory;
+import com.laps.backend.models.LeaveApplication;
 import com.laps.backend.services.LeavehistoryService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
@@ -18,29 +18,29 @@ public class LeavehistoryController {
     private LeavehistoryService leavehistoryService;
 
     @GetMapping(value = "/viewleavehistory")
-    public List<Leavehistory> getAllLeavehistorys(){
+    public List<LeaveApplication> getAllLeavehistorys(){
         return leavehistoryService.findAllLeavehistorys();
     }
 
     @GetMapping("/viewleavehistory/{status}")
-    public ResponseEntity<Leavehistory> getLeavehistoryByStatus(@PathVariable("status") String status){
-        Optional<Leavehistory> optLeavehistory = leavehistoryService.findByStatus(status);
+    public ResponseEntity<LeaveApplication> getLeavehistoryByStatus(@PathVariable("status") String status){
+        Optional<LeaveApplication> optLeavehistory = leavehistoryService.findByStatus(status);
 
         if(optLeavehistory.isPresent()){
-            Leavehistory leavehistory = optLeavehistory.get();
+            LeaveApplication leavehistory = optLeavehistory.get();
             return new
-                    ResponseEntity<Leavehistory>(leavehistory, HttpStatus.OK);
+                    ResponseEntity<LeaveApplication>(leavehistory, HttpStatus.OK);
         }else{
             return new
-                    ResponseEntity<Leavehistory>(HttpStatus.NOT_FOUND);
+                    ResponseEntity<LeaveApplication>(HttpStatus.NOT_FOUND);
         }
     }
 
     @PostMapping("/viewleavehistory/create")
-    public ResponseEntity<Leavehistory> createLeavehistory(@RequestBody Leavehistory inLeavehistory){
+    public ResponseEntity<LeaveApplication> createLeavehistory(@RequestBody LeaveApplication inLeavehistory){
         try {
-            Leavehistory retLeavehistory = leavehistoryService.createLeavehistory(inLeavehistory);
-            return new ResponseEntity<Leavehistory>(retLeavehistory, HttpStatus.
+            LeaveApplication retLeavehistory = leavehistoryService.createLeavehistory(inLeavehistory);
+            return new ResponseEntity<LeaveApplication>(retLeavehistory, HttpStatus.
                     CREATED);
         } catch (Exception e) {
             return new ResponseEntity<>(HttpStatus.
@@ -49,19 +49,20 @@ public class LeavehistoryController {
     }
 
     @PutMapping("/viewleavehistory/update/{id}")
-    public ResponseEntity<Leavehistory> updateLeavehistory(@PathVariable("id") int id, @RequestBody Leavehistory
+    public ResponseEntity<LeaveApplication> updateLeavehistory(@PathVariable("id") int id, @RequestBody LeaveApplication
             inLeavehistory) {
-        Optional<Leavehistory> optLeavehistory = leavehistoryService.findById(id);
+        Optional<LeaveApplication> optLeavehistory = leavehistoryService.findById(id);
         if (optLeavehistory.isPresent()) {
 // Update the managed course obj
-            Leavehistory leavehistory = optLeavehistory.get();
-            leavehistory.setStart(inLeavehistory.getStart());
-            leavehistory.setEnd(inLeavehistory.getEnd());
+            LeaveApplication leavehistory = optLeavehistory.get();
+            leavehistory.setStartDate(inLeavehistory.getStartDate());
+            leavehistory.setEndDate(inLeavehistory.getEndDate());
             leavehistory.setType(inLeavehistory.getType());
             leavehistory.setReason(inLeavehistory.getReason());
             leavehistory.setStatus(inLeavehistory.getStatus());
-            Leavehistory updatedLeavehistory = leavehistoryService.updateLeavehistory(leavehistory);
-            return new ResponseEntity<Leavehistory>(updatedLeavehistory, HttpStatus.
+            leavehistory.setComment(inLeavehistory.getComment());
+            LeaveApplication updatedLeavehistory = leavehistoryService.updateLeavehistory(leavehistory);
+            return new ResponseEntity<LeaveApplication>(updatedLeavehistory, HttpStatus.
                     OK);
         } else {
             return new ResponseEntity<>(HttpStatus.
@@ -70,17 +71,18 @@ public class LeavehistoryController {
     }
 
     @PutMapping("/viewleavehistory/cancel/{id}")
-    public ResponseEntity<Leavehistory> cancelLeavehistory(@PathVariable("id")int id,@RequestBody Leavehistory inLeavehistory){
-        Optional<Leavehistory> optLeavehistory = leavehistoryService.findById(id);
-        if (optLeavehistory.isPresent() && inLeavehistory.getStatus() == "approved"){
-            Leavehistory leavehistory = optLeavehistory.get();
-            leavehistory.setStart(inLeavehistory.getStart());
-            leavehistory.setEnd(inLeavehistory.getEnd());
+    public ResponseEntity<LeaveApplication> cancelLeavehistory(@PathVariable("id")int id,@RequestBody LeaveApplication inLeavehistory){
+        Optional<LeaveApplication> optLeavehistory = leavehistoryService.findById(id);
+        if (optLeavehistory.isPresent() && inLeavehistory.getStatus() == "Approved"){
+            LeaveApplication leavehistory = optLeavehistory.get();
+            leavehistory.setStartDate(inLeavehistory.getStartDate());
+            leavehistory.setEndDate(inLeavehistory.getEndDate());
             leavehistory.setType(inLeavehistory.getType());
             leavehistory.setReason(inLeavehistory.getReason());
+            leavehistory.setComment(inLeavehistory.getComment());
             leavehistory.setStatus("cancel");
-            Leavehistory updatedLeavehistory = leavehistoryService.cancleLeavehistory(leavehistory);
-            return new ResponseEntity<Leavehistory>(updatedLeavehistory, HttpStatus.
+            LeaveApplication updatedLeavehistory = leavehistoryService.cancleLeavehistory(leavehistory);
+            return new ResponseEntity<LeaveApplication>(updatedLeavehistory, HttpStatus.
                     OK);
         } else {
             return new ResponseEntity<>(HttpStatus.
