@@ -3,9 +3,9 @@ package com.laps.backend.repositories;
 import com.laps.backend.models.Employee;
 import com.laps.backend.models.LeaveApplication;
 import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.stereotype.Repository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
-import org.springframework.stereotype.Repository;
 
 import java.util.List;
 import java.util.Optional;
@@ -14,6 +14,8 @@ import java.util.Optional;
 public interface LeaveApplicationRepository extends JpaRepository<LeaveApplication, Long> {
     // Query methods for LeaveApplication
     List<LeaveApplication> findByStatus(String status);
+
+    List<LeaveApplication> findByEmployee(Employee employee);
 
     @Query("select l from LeaveApplication as l where l.employee.id = :employee_id")
     Optional<List<LeaveApplication>> findEmployeeAllApplications(@Param("employee_id") Long employee_id);
@@ -30,10 +32,6 @@ public interface LeaveApplicationRepository extends JpaRepository<LeaveApplicati
 
     @Query("select l from LeaveApplication  as l where l.employee = :employee_id and l.status = 'Canceled'")
     Optional<List<LeaveApplication>> findCanceledApplicationByEmployee(@Param("employee_id") Long id);
-
-
-
-    List<LeaveApplication> findByEmployee(Employee employee);
 
 }
 

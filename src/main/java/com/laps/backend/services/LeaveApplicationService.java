@@ -38,6 +38,4 @@ public interface LeaveApplicationService {
 
 
     List<LeaveApplication> getAllUpdatedApplications();
-
-
 }

@@ -12,8 +12,10 @@ public interface UserService {
     void save(User user);
 
     //list all employees belong to a manager
-    List<Employee> findAllEmplyeeByManager(Manager manager);
+    List<Employee> findAllEmployeeByManager(Manager manager);
 
     //find manager by id
     Manager findManagerById(long id);
+
+    List<User> searchUser(String[] keyword);
 }
