@@ -130,11 +130,14 @@ public class LeaveApplicationController {
             Optional<List<LeaveApplication>> optLeaveApplications = leaveApplicationService.getEmployeeAllApplications(employee);
             if (optLeaveApplications.isPresent()){
                 List<LeaveApplication> leaveApplications = optLeaveApplications.get();
+                List<LeaveApplicationDTO>  leaveApplicationDTOS = new ArrayList<>();
+                leaveApplications.stream().forEach(application ->  leaveApplicationDTOS.add(new LeaveApplicationDTO(application)));
                 return new
-                        ResponseEntity<List<LeaveApplication>>(leaveApplications,HttpStatus.OK);
+                        ResponseEntity<List<LeaveApplicationDTO>>(leaveApplicationDTOS,HttpStatus.OK);
+
             }else {
                 return new
-                        ResponseEntity<List<LeaveApplication>>(HttpStatus.NOT_FOUND);
+                        ResponseEntity<List<LeaveApplicationDTO>>(HttpStatus.NOT_FOUND);
             }
         }else {
             return new
@@ -160,11 +163,12 @@ public class LeaveApplicationController {
                 leaveApplication.setStatus(leaveApplicationBody.get("Status"));
                 leaveApplication.setComment(leaveApplicationBody.get("Comment"));
                 leaveApplication.setReason(leaveApplicationBody.get("Reason"));
+                LeaveApplicationDTO leaveApplicationDTO = new LeaveApplicationDTO(leaveApplication);
                 return new
-                        ResponseEntity<LeaveApplication>(leaveApplication, HttpStatus.OK);
+                        ResponseEntity<LeaveApplicationDTO>(leaveApplicationDTO, HttpStatus.OK);
             }else{
                 return new
-                        ResponseEntity<LeaveApplication>(HttpStatus.NOT_FOUND);
+                        ResponseEntity<LeaveApplicationDTO>(HttpStatus.NOT_FOUND);
             }
 
         }else {
@@ -177,6 +181,7 @@ public class LeaveApplicationController {
 
     @PutMapping("/cancel/{id}")
     public ResponseEntity<?> cancelEmployeeApplication(@PathVariable("id") Long inid,@RequestBody Map<String,String> leaveApplicationBody) throws ParseException {
+
         Optional<Employee> optEmployee = employeeService.findById(inid);
         if(optEmployee.isPresent()){
 
@@ -185,11 +190,12 @@ public class LeaveApplicationController {
             if (optleaveApplication.isPresent()) {
                 LeaveApplication leaveApplication = optleaveApplication.get();
                 leaveApplication.setStatus("Canceled");
+                LeaveApplicationDTO leaveApplicationDTO = new LeaveApplicationDTO(leaveApplication);
                 return new
-                        ResponseEntity<LeaveApplication>(leaveApplication, HttpStatus.OK);
+                        ResponseEntity<LeaveApplicationDTO>(leaveApplicationDTO, HttpStatus.OK);
             }else{
                 return new
-                        ResponseEntity<LeaveApplication>(HttpStatus.NOT_FOUND);
+                        ResponseEntity<LeaveApplicationDTO>(HttpStatus.NOT_FOUND);
             }
 
         }else {
@@ -211,11 +217,12 @@ public class LeaveApplicationController {
             if (optleaveApplication.isPresent()) {
                 LeaveApplication leaveApplication = optleaveApplication.get();
                 leaveApplication.setStatus("Deleted");
+                LeaveApplicationDTO leaveApplicationDTO = new LeaveApplicationDTO(leaveApplication);
                 return new
-                        ResponseEntity<LeaveApplication>(leaveApplication, HttpStatus.OK);
+                        ResponseEntity<LeaveApplicationDTO>(leaveApplicationDTO, HttpStatus.OK);
             }else{
                 return new
-                        ResponseEntity<LeaveApplication>(HttpStatus.NOT_FOUND);
+                        ResponseEntity<LeaveApplicationDTO>(HttpStatus.NOT_FOUND);
             }
 
         }else {

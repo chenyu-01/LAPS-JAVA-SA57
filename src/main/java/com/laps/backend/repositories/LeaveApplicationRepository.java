@@ -3,6 +3,7 @@ package com.laps.backend.repositories;
 import com.laps.backend.models.Employee;
 import com.laps.backend.models.LeaveApplication;
 import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.data.jpa.repository.JpaSpecificationExecutor;
 import org.springframework.stereotype.Repository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
@@ -11,7 +12,7 @@ import java.util.List;
 import java.util.Optional;
 
 @Repository
-public interface LeaveApplicationRepository extends JpaRepository<LeaveApplication, Long> {
+public interface LeaveApplicationRepository extends JpaRepository<LeaveApplication, Long>, JpaSpecificationExecutor<LeaveApplication> {
     // Query methods for LeaveApplication
     List<LeaveApplication> findByStatus(String status);
 
