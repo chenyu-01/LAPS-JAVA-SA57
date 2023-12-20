@@ -10,6 +10,8 @@ import org.springframework.boot.CommandLineRunner;
 import org.springframework.context.annotation.Bean;
 
 import java.util.Date;
+import java.util.List;
+
 @SpringBootApplication(exclude={SecurityAutoConfiguration.class})
 public class LapsBackendApplication {
 
@@ -25,16 +27,25 @@ public class LapsBackendApplication {
 			user3.setPassword("password123");
 			user3.setName("Test User 3");
 			user3.setRole("Manager");
-			userRepository.save(user3);
-
+			userRepository.save(user3); // persist manager to database first
 			User user = new Employee();
 			user.setEmail("testuser@gmail.com");
 			user.setPassword("yYjHDp)d~+]Pb6");
-			user.setName("Test User");
+			user.setName("Employee1");
 			user.setRole("Employee");
 			((Employee) user).setManager((Manager) user3);
 			userRepository.save(user);
+			User user1 = new Employee();
+			user1.setEmail("testuser1@gmail.com");
+			user1.setPassword("password123");
+			user1.setName("Employee2");
+			user1.setRole("Employee");
+			((Employee) user1).setManager((Manager) user3);
+			userRepository.save(user1);
 
+			List<Employee> employees = List.of((Employee) user, (Employee) user1);
+			((Manager) user3).setSubordinates(employees);
+			userRepository.save(user3);
 			for (int i = 0; i < 10; i++){
 				LeaveApplication leaveApplication1 = new LeaveApplication();
 				leaveApplication1.setEmployee((Employee) user);
