@@ -1,11 +1,7 @@
 package com.laps.backend.controllers;
 
-import com.laps.backend.models.Employee;
-import com.laps.backend.models.LeaveApplication;
-import com.laps.backend.models.LeaveApplicationDTO;
-import com.laps.backend.models.Manager;
+import com.laps.backend.models.*;
 import com.laps.backend.services.LeaveApplicationService;
-import com.laps.backend.services.LeaveApplicationServiceImpl;
 import com.laps.backend.services.UserService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
@@ -49,7 +45,7 @@ public class LeaveApplicationController {
             }
 
             List<LeaveApplication> applications = new ArrayList<>();
-            userService.findAllEmplyeeByManager(manager)
+            userService.findAllEmployeeByManager(manager)
                     .stream()
                     .forEach(employee -> applications.addAll(leaveApplicationService.getAppliedApplicationsByEmployee(employee)));
 
@@ -95,5 +91,23 @@ public class LeaveApplicationController {
         } catch (Exception e) {
             return ResponseEntity.badRequest().body(e.getMessage());
         }
-    }}
+    }
+    @GetMapping("/search")
+    public ResponseEntity<?> searchApplication(@RequestBody Map<String, String> search) {
+        //check request body
+        if (search.isEmpty()) {
+            return ResponseEntity.badRequest().body("Invalid request body");
+        }
+
+        String[] keywords = search.get("keywords").toLowerCase().split(" ");
+
+        List<LeaveApplication> applications = leaveApplicationService.fuzzySearchApplication(keywords);
+
+        //find all applications that match the keywords about Employee's name
+        //List<Employee> employees = userService.searchUser(keywords);
+
+        return ResponseEntity.ok(applications);
+    }
+
+}
 

@@ -17,4 +17,7 @@ public interface LeaveApplicationService {
     void rejectApplication(Long id);
 
     void addCommentToApplication(Long id, String comment);
+
+    public List<LeaveApplication> fuzzySearchApplication(String[] keywords);
+
 }
