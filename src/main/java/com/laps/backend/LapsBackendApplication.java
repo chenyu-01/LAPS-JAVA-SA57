@@ -1,7 +1,7 @@
 package com.laps.backend;
 
 import com.laps.backend.models.*;
-import com.laps.backend.repositories.LeaveApplicationRepository;
+import com.laps.backend.repositories.*;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.boot.autoconfigure.security.servlet.SecurityAutoConfiguration;
@@ -14,6 +14,7 @@ import com.laps.backend.repositories.PublicHolidayRepository;
 
 import java.time.LocalDate;
 import java.util.Date;
+import java.util.List;
 
 @SpringBootApplication(exclude={SecurityAutoConfiguration.class})
 public class LapsBackendApplication {
@@ -47,15 +48,27 @@ public class LapsBackendApplication {
 			LeaveType lt9 = leaveTypeRepository.save(new LeaveType("Manager",LeaveTypeEnum.COMPENSATION, 10));
 
 			Employee user = new Employee();
+
 			user.setEmail("testuser@gmail.com");
 			user.setPassword("yYjHDp)d~+]Pb6");
-			user.setName("Test User");
+			user.setName("Employee1");
 			user.setRole("Employee");
+			((Employee) user).setManager((Manager) user3);
 			userRepository.save(user);
+			User user1 = new Employee();
+			user1.setEmail("testuser1@gmail.com");
+			user1.setPassword("password123");
+			user1.setName("Employee2");
+			user1.setRole("Employee");
+			((Employee) user1).setManager((Manager) user3);
+			userRepository.save(user1);
 
+			List<Employee> employees = List.of((Employee) user, (Employee) user1);
+			((Manager) user3).setSubordinates(employees);
+			userRepository.save(user3);
 			for (int i = 0; i < 10; i++){
 				LeaveApplication leaveApplication1 = new LeaveApplication();
-				leaveApplication1.setEmployee(user);
+				leaveApplication1.setEmployee((Employee) user);
 				leaveApplication1.setStartDate(Date.from(new Date().toInstant().plusSeconds(86400))); // tomorrow
 				leaveApplication1.setEndDate(Date.from(new Date().toInstant().plusSeconds(86400 * 2))); // day after tomorrow
 				leaveApplication1.setReason("Sick");

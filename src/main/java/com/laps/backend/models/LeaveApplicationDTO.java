@@ -17,7 +17,7 @@ public class LeaveApplicationDTO implements Serializable {
     private String status;
     private String comment;
     private String reason;
-
+    private String contactInfo;
     private String employeeId;
 
     public LeaveApplicationDTO(LeaveApplication other) {
@@ -29,5 +29,6 @@ public class LeaveApplicationDTO implements Serializable {
         this.comment = other.getComment();
         this.reason = other.getReason();
         this.employeeId = other.getEmployee().getId().toString();
+        this.contactInfo = other.getContactInfo();
     }
 }
