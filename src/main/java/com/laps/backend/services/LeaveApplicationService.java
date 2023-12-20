@@ -21,6 +21,8 @@ public interface LeaveApplicationService {
 
     Optional<LeaveApplication> findById(Long id,Long employee_id);
     Optional<LeaveApplication> findById(Long id);
+
+    Optional<List<LeaveApplication>> getEmployeeAllApplications(Employee employee);
     LeaveApplication saveApplication(LeaveApplication leaveApplication);
 
     List<LeaveApplication> getAllApprovedApplications();

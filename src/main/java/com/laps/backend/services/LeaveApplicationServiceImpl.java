@@ -25,6 +25,10 @@ public class LeaveApplicationServiceImpl implements LeaveApplicationService{
         return leaveApplicationRepository.findAll();
     }
 
+    public Optional<List<LeaveApplication>> getEmployeeAllApplications(Employee employee){
+        Long id = employee.getId();
+        return leaveApplicationRepository.findEmployeeAllApplications(id);
+    }
 
     // 获取所有状态为 "Applied" 的申请
     @Override
@@ -76,6 +80,21 @@ public class LeaveApplicationServiceImpl implements LeaveApplicationService{
     @Override
     public List<LeaveApplication> getAppliedApplicationsByEmployee(Employee employee) {
         return leaveApplicationRepository.findByEmployee(employee);
+    }
+
+    public Optional<List<LeaveApplication>> getApprovedApplicationByEmployee(Employee employee){
+        Long id = employee.getId();
+        return leaveApplicationRepository.findApprovedApplicationByEmployee(id);
+    }
+
+    public Optional<List<LeaveApplication>> getRejectedApplicationByEmployee(Employee employee){
+        Long id = employee.getId();
+        return leaveApplicationRepository.findApprovedApplicationByEmployee(id);
+    }
+
+    public Optional<List<LeaveApplication>> getCanceledApplicationByEmployee(Employee employee){
+        Long id = employee.getId();
+        return leaveApplicationRepository.findApprovedApplicationByEmployee(id);
     }
 
     @Override
