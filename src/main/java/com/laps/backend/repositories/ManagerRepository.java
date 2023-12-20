@@ -9,7 +9,4 @@ import java.util.List;
 public interface ManagerRepository extends JpaRepository<Manager, Long> {
     //Find manager by id
     Manager findById(long id);
-
-    //List all related employees
-    List<Employee> findAllEmployeeByManager(Manager manager);
 }

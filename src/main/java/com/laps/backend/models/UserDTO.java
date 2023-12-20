@@ -22,5 +22,4 @@ public class UserDTO implements Serializable { // Data Transfer Object
         this.email = other.getEmail();
     }
 
-
 }
