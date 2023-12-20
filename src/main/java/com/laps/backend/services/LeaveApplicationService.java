@@ -20,6 +20,7 @@ public interface LeaveApplicationService {
     void addCommentToApplication(Long id, String comment);
 
     Optional<LeaveApplication> findById(Long id,Long employee_id);
+    Optional<LeaveApplication> findById(Long id);
     LeaveApplication saveApplication(LeaveApplication leaveApplication);
 
     List<LeaveApplication> getAllApprovedApplications();

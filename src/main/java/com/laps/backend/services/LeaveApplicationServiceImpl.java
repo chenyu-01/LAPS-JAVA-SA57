@@ -31,22 +31,28 @@ public class LeaveApplicationServiceImpl implements LeaveApplicationService{
     public List<LeaveApplication> getAllAppliedApplications() {
         return leaveApplicationRepository.findByStatus("Applied");
     }
+
+    // 获取所有状态为 "Approved" 的申请
     @Override
     public List<LeaveApplication> getAllApprovedApplications() {
         return leaveApplicationRepository.findByStatus("Approved");
     }
+    // 获取所有状态为 "Rejected" 的申请
     @Override
     public List<LeaveApplication> getAllRejectedApplications() {
         return leaveApplicationRepository.findByStatus("Rejected");
     }
+    // 获取所有状态为 "Deleted" 的申请
     @Override
     public List<LeaveApplication> getAllDeletedApplications() {
         return leaveApplicationRepository.findByStatus("Deleted");
     }
+    // 获取所有状态为 "Canceled" 的申请
     @Override
     public List<LeaveApplication> getAllCanceledApplications() {
         return leaveApplicationRepository.findByStatus("Canceled");
     }
+    // 获取所有状态为 "Updated" 的申请
     @Override
     public List<LeaveApplication> getAllUpdatedApplications() {
         return leaveApplicationRepository.findByStatus("Updated");
@@ -55,6 +61,11 @@ public class LeaveApplicationServiceImpl implements LeaveApplicationService{
     @Override
     public Optional<LeaveApplication> findById(Long id,Long employee_id){
         return leaveApplicationRepository.findById(id,employee_id);
+    }
+
+    @Override
+    public Optional<LeaveApplication> findById(Long id){
+        return leaveApplicationRepository.findById(id);
     }
 
     @Override

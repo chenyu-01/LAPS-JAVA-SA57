@@ -52,7 +52,18 @@ public class LeaveApplicationController {
 
     @GetMapping("/Rejected")
     public ResponseEntity<List<LeaveApplicationDTO>> getAllRejectedApplications() {
-        List<LeaveApplication> applications = leaveApplicationService.getAllApprovedApplications();
+        List<LeaveApplication> applications = leaveApplicationService.getAllRejectedApplications();
+        if (applications.isEmpty()) {
+            return ResponseEntity.noContent().build();
+        }
+        List<LeaveApplicationDTO> applicationDTOS = new ArrayList<>();
+        applications.stream().forEach(application -> applicationDTOS.add(new LeaveApplicationDTO(application)));
+        return ResponseEntity.ok(applicationDTOS);
+    }
+
+    @GetMapping("/Canceled")
+    public ResponseEntity<List<LeaveApplicationDTO>> getAllCanceledApplications() {
+        List<LeaveApplication> applications = leaveApplicationService.getAllCanceledApplications();
         if (applications.isEmpty()) {
             return ResponseEntity.noContent().build();
         }
@@ -95,7 +106,8 @@ public class LeaveApplicationController {
     }
 
 
-    @PutMapping("/leaveApplication/find/{id}")
+
+    @PutMapping("/find/{id}")
     public ResponseEntity<?> findById(@PathVariable("id") Long id, @RequestBody Employee employee){
         Optional<Employee> optEmployee = leaveApplicationService.findEmployeeById(employee.getId());
         if (optEmployee.isPresent()){
@@ -113,6 +125,61 @@ public class LeaveApplicationController {
                     ResponseEntity<Employee>(HttpStatus.NOT_FOUND);
         }
     }
+
+    @PutMapping("/update/{id}")
+    public ResponseEntity<LeaveApplication> updateLeaveApplication(@PathVariable("id") Long id,
+                                                    @RequestBody LeaveApplication inLeaveApplication){
+        Optional<LeaveApplication> optLeaveApplication = leaveApplicationService.findById(id);
+        if (optLeaveApplication.isPresent()){
+            LeaveApplication leaveApplication =optLeaveApplication.get();
+            leaveApplication.setStartDate(inLeaveApplication.getStartDate());
+            leaveApplication.setEndDate(inLeaveApplication.getEndDate());
+            leaveApplication.setType(inLeaveApplication.getType());
+            leaveApplication.setStatus(inLeaveApplication.getStatus());
+            leaveApplication.setComment(inLeaveApplication.getComment());
+            leaveApplication.setReason(inLeaveApplication.getReason());
+            return new
+                    ResponseEntity<LeaveApplication>(leaveApplication,HttpStatus.OK);
+        }else{
+            return new
+                    ResponseEntity<LeaveApplication>(HttpStatus.NOT_FOUND);
+        }
+    }
+
+    @PutMapping("/cancel/{id}")
+    public ResponseEntity<LeaveApplication> cancelLeaveApplication(@PathVariable("id") Long id,
+                                                                   @RequestBody LeaveApplication inLeaveApplication){
+        Optional<LeaveApplication> optLeaveApplication = leaveApplicationService.findById(id);
+        if (optLeaveApplication.isPresent()){
+            LeaveApplication leaveApplication =optLeaveApplication.get();
+            leaveApplication.setStatus("Canceled");
+
+            return new
+                    ResponseEntity<LeaveApplication>(leaveApplication,HttpStatus.OK);
+        }else{
+            return new
+                    ResponseEntity<LeaveApplication>(HttpStatus.NOT_FOUND);
+        }
+    }
+
+
+    @PutMapping("/delete/{id}")
+    public ResponseEntity<LeaveApplication> deleteLeaveApplication(@PathVariable("id") Long id,
+                                                                   @RequestBody LeaveApplication inLeaveApplication){
+        Optional<LeaveApplication> optLeaveApplication = leaveApplicationService.findById(id);
+        if (optLeaveApplication.isPresent()){
+            LeaveApplication leaveApplication =optLeaveApplication.get();
+            leaveApplication.setStatus("Deleted");
+
+            return new
+                    ResponseEntity<LeaveApplication>(leaveApplication,HttpStatus.OK);
+        }else{
+            return new
+                    ResponseEntity<LeaveApplication>(HttpStatus.NOT_FOUND);
+        }
+    }
+
+
 
 
 
