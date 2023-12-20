@@ -122,7 +122,7 @@ public class LeaveApplicationController {
         return ResponseEntity.ok(applicationDTOS);
     }
 
-    @PutMapping("/find/{id}")
+    @GetMapping("/find/{id}")
     public ResponseEntity<?> findEmployeeApplication(@PathVariable("id") Long id){
         Optional<Employee> optEmployee = employeeService.findById(id);
         if (optEmployee.isPresent()){
