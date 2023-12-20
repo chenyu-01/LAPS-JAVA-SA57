@@ -15,17 +15,17 @@ public interface LeaveApplicationRepository extends JpaRepository<LeaveApplicati
     // Query methods for LeaveApplication
     List<LeaveApplication> findByStatus(String status);
 
-    @Query("select l from LeaveApplication as l where l.employee = :employee_id")
+    @Query("select l from LeaveApplication as l where l.employee.id = :employee_id")
     Optional<List<LeaveApplication>> findEmployeeAllApplications(@Param("employee_id") Long employee_id);
-    @Query("select l from LeaveApplication as l where l.id = :id and l.employee = :employee_id")
+    @Query("select l from LeaveApplication as l where l.id = :id and l.employee.id = :employee_id")
     Optional<LeaveApplication> findById(@Param("id") Long id,@Param("employee_id") Long employee_id);
     @Query("select e from  Employee as e where e.id = :id")
     Optional<Employee> findEmployeeById(@Param("id") Long id);
 
-    @Query("select l from LeaveApplication  as l where l.employee = :employee_id and l.status = 'Approved'")
+    @Query("select l from LeaveApplication  as l where l.employee.id = :employee_id and l.status = 'Approved'")
     Optional<List<LeaveApplication>> findApprovedApplicationByEmployee(@Param("employee_id") Long id);
 
-    @Query("select l from LeaveApplication  as l where l.employee = :employee_id and l.status = 'Rejected'")
+    @Query("select l from LeaveApplication  as l where l.employee.id = :employee_id and l.status = 'Rejected'")
     Optional<List<LeaveApplication>> findRejectedApplicationByEmployee(@Param("employee_id") Long id);
 
     @Query("select l from LeaveApplication  as l where l.employee = :employee_id and l.status = 'Canceled'")

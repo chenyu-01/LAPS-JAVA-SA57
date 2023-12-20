@@ -1,9 +1,9 @@
 package com.laps.backend.services;
 
+
 import com.laps.backend.models.Employee;
 import com.laps.backend.models.LeaveApplication;
 import com.laps.backend.repositories.LeaveApplicationRepository;
-import com.laps.backend.repositories.LeaveTypeRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -69,13 +69,10 @@ public class LeaveApplicationServiceImpl implements LeaveApplicationService{
 
     @Override
     public Optional<LeaveApplication> findById(Long id){
+
         return leaveApplicationRepository.findById(id);
     }
 
-    @Override
-    public Optional<Employee> findEmployeeById(Long id){
-        return leaveApplicationRepository.findEmployeeById(id);
-    }
 
     @Override
     public List<LeaveApplication> getAppliedApplicationsByEmployee(Employee employee) {
