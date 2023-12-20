@@ -12,7 +12,7 @@ public interface LeaveApplicationService {
 
     // 获取所有状态为 "Applied" 的申请
     public List<LeaveApplication> getAllAppliedApplications() ;
-
+    public List<LeaveApplication> getAppliedApplicationsByEmployee(Employee employee);
     void approveApplication(Long id);
 
     void rejectApplication(Long id);

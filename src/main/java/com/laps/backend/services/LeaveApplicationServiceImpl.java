@@ -74,6 +74,11 @@ public class LeaveApplicationServiceImpl implements LeaveApplicationService{
     }
 
     @Override
+    public List<LeaveApplication> getAppliedApplicationsByEmployee(Employee employee) {
+        return leaveApplicationRepository.findByEmployee(employee);
+    }
+
+    @Override
     public void approveApplication(Long id) {
         //check if application exists
         leaveApplicationRepository.findById(id).orElseThrow(() -> new RuntimeException("Application not found"));
