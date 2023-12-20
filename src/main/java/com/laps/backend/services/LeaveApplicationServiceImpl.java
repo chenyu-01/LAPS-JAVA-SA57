@@ -10,6 +10,7 @@ import java.util.List;
 
 @Service
 public class LeaveApplicationServiceImpl implements LeaveApplicationService{
+
     @Autowired
     private final LeaveApplicationRepository leaveApplicationRepository;
 

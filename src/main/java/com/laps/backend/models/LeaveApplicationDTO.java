@@ -19,6 +19,7 @@ public class LeaveApplicationDTO implements Serializable {
     private String reason;
     private String contactInfo;
     private String employeeId;
+    private String leaveid;
 
     public LeaveApplicationDTO(LeaveApplication other) {
         this.id = other.getId().toString();
@@ -30,5 +31,6 @@ public class LeaveApplicationDTO implements Serializable {
         this.reason = other.getReason();
         this.employeeId = other.getEmployee().getId().toString();
         this.contactInfo = other.getContactInfo();
+        this.leaveid=other.getId().toString();
     }
 }
