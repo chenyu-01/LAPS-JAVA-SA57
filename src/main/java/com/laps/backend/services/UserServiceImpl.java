@@ -31,7 +31,7 @@ public class UserServiceImpl implements UserService {
 
     @Override
     public List<Employee> findAllEmplyeeByManager(Manager manager) {
-        return manager_repository.findAllEmplyeeByManager(manager);
+        return manager_repository.findAllEmployeeByManager(manager);
     }
 
     @Override
