@@ -23,13 +23,13 @@ public interface LeaveApplicationRepository extends JpaRepository<LeaveApplicati
     Optional<Employee> findEmployeeById(@Param("id") Long id);
 
     @Query("select l from LeaveApplication  as l where l.employee = :employee_id and l.status = 'Approved'")
-    Optional<List<LeaveApplication>> findApprovedApplicationByEmployee(@Param("id") Long id);
+    Optional<List<LeaveApplication>> findApprovedApplicationByEmployee(@Param("employee_id") Long id);
 
     @Query("select l from LeaveApplication  as l where l.employee = :employee_id and l.status = 'Rejected'")
-    Optional<List<LeaveApplication>> findRejectedApplicationByEmployee(@Param("id") Long id);
+    Optional<List<LeaveApplication>> findRejectedApplicationByEmployee(@Param("employee_id") Long id);
 
     @Query("select l from LeaveApplication  as l where l.employee = :employee_id and l.status = 'Canceled'")
-    Optional<List<LeaveApplication>> findCanceledApplicationByEmployee(@Param("id") Long id);
+    Optional<List<LeaveApplication>> findCanceledApplicationByEmployee(@Param("employee_id") Long id);
 
 
 
