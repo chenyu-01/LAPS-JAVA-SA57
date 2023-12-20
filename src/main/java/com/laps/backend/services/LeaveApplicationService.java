@@ -17,4 +17,6 @@ public interface LeaveApplicationService {
     void rejectApplication(Long id);
 
     void addCommentToApplication(Long id, String comment);
+
+
 }

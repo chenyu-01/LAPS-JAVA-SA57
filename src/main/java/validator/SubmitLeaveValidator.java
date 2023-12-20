@@ -21,7 +21,7 @@ public class SubmitLeaveValidator implements Validator {
 
         if (submitLeaveDto.getFromDate() == null || submitLeaveDto.getToDate() == null ||
                 submitLeaveDto.getLeaveCategory() == null || submitLeaveDto.getAdditionalReasons() == null) {
-            return false;
+            return;
         }
 
         if ((submitLeaveDto.getFromDate() != null && submitLeaveDto.getToDate() != null) &&
@@ -32,7 +32,7 @@ public class SubmitLeaveValidator implements Validator {
         }
         // Check if dates are in chronologically increasing order
         if (submitLeaveDto.getFromDate().isAfter(submitLeaveDto.getToDate())) {
-            return false;
+            return ;
         }
 
         // Check annual leave computation
@@ -45,17 +45,17 @@ public class SubmitLeaveValidator implements Validator {
 
             // Check if From and To dates are working days
             if (!isWorkingDay(submitLeaveDto.getFromDate()) || !isWorkingDay(submitLeaveDto.getToDate())) {
-                return false;
+                return ;
             }
         }
 
         // Additional validation logic based on employee designation
         // For example, you can check entitlement based on designation
         if (leaveDays > 60 && "Medical".equalsIgnoreCase(submitLeaveDto.getLeaveCategory())) {
-            return false;
+            return ;
         }
 
-        return true; // Valid if all conditions are met
+        return ; // Valid if all conditions are met
     }
 
 

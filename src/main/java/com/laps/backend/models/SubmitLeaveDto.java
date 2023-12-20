@@ -76,4 +76,6 @@ public class SubmitLeaveDto {
     public void setContactDetails(String contactDetails) {
         this.contactDetails = contactDetails;
     }
+
+
 }

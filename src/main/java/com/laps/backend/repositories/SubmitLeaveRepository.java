@@ -10,4 +10,5 @@ import java.util.List;
 public interface SubmitLeaveRepository extends JpaRepository<LeaveApplication, Long> {
     // You can add custom query methods if needed
     List<LeaveApplication> findByEmployee(Employee employee);
+
 }

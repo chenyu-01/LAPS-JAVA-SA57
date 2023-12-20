@@ -23,4 +23,6 @@ public interface SubmitLeaveService {
     void cancelLeave(String leaveId);
 
     List<LeaveApplication> getAppliedApplicationsByEmployee(Employee employee);
+
+
 }

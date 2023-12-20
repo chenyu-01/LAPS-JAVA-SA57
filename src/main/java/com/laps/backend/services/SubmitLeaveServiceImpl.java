@@ -8,6 +8,7 @@ import com.laps.backend.repositories.SubmitLeaveRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import com.laps.backend.repositories.LeaveApplicationRepository;
 
 import java.time.LocalDate;
 import java.util.List;
@@ -24,38 +25,38 @@ public class SubmitLeaveServiceImpl implements SubmitLeaveService {
     }
 
     @Override
-    public void submitLeave(SubmitLeaveDto submitLeaveDto) throws LeaveValidationException {
+    public void submitLeave(SubmitLeaveDto insubmitLeaveDto) throws LeaveValidationException {
         // Implement leave submission logic including validation
 
-        validateLeaveApplication(submitLeaveDto);
+        validate(insubmitLeaveDto);
 
         // Set the status to 'Applied'
-        submitLeaveDto.setStatus("Applied");
+        //submitLeaveDto.setStatus("Applied");
 
         // Save to the repository
-        LeaveApplication leaveApplication = mapDtoToEntity(submitLeaveDto);
-        submitLeaveRepository.save(leaveApplication);
+        SubmitLeaveDto submitLeaveDto = mapDtoToEntity(insubmitLeaveDto);
+        .save(submitLeaveDto);
 
     }
 
-    private void validateLeaveApplication(SubmitLeaveDto submitLeaveDto) throws LeaveValidationException {
-        // Check if mandatory details are provided
-        if (submitLeaveDto.getFromDate() == null || submitLeaveDto.getToDate() == null ||
-                submitLeaveDto.getLeaveCategory() == null || submitLeaveDto.getLeaveCategory().isEmpty()) {
-            throw new LeaveValidationException("Mandatory leave details are missing");
-        }
-
-        // Check if dates are in chronologically increasing order
-        if (submitLeaveDto.getFromDate().isAfter(submitLeaveDto.getToDate())) {
-            throw new LeaveValidationException("Dates From and To should be in chronological order");
-        }
-
-        // Additional validation logic as needed
-        // ...
-
-        // Check annual leave computation
-        validateAnnualLeave(submitLeaveDto);
-    }
+//    private void validateLeaveApplication(SubmitLeaveDto submitLeaveDto) throws LeaveValidationException {
+//        // Check if mandatory details are provided
+//        if (submitLeaveDto.getFromDate() == null || submitLeaveDto.getToDate() == null ||
+//                submitLeaveDto.getLeaveCategory() == null || submitLeaveDto.getLeaveCategory().isEmpty()) {
+//            throw new LeaveValidationException("Mandatory leave details are missing");
+//        }
+//
+//        // Check if dates are in chronologically increasing order
+//        if (submitLeaveDto.getFromDate().isAfter(submitLeaveDto.getToDate())) {
+//            throw new LeaveValidationException("Dates From and To should be in chronological order");
+//        }
+//
+//        // Additional validation logic as needed
+//        // ...
+//
+//        // Check annual leave computation
+//        validateAnnualLeave(submitLeaveDto);
+//    }
 
     private void validateAnnualLeave(SubmitLeaveDto submitLeaveDto) throws LeaveValidationException {
         LocalDate fromDate = submitLeaveDto.getFromDate();
@@ -76,18 +77,18 @@ public class SubmitLeaveServiceImpl implements SubmitLeaveService {
         }
     }
 
-    private LeaveApplication mapDtoToEntity(SubmitLeaveDto submitLeaveDto) {
-        LeaveApplication leaveApplication = new LeaveApplication();
+    private SubmitLeaveDto mapDtoToEntity(SubmitLeaveDto insubmitLeaveDto) {
+        SubmitLeaveDto submitLeaveDto = new SubmitLeaveDto();
 
         // Map properties from DTO to Entity
-        leaveApplication.setFromDate(submitLeaveDto.getFromDate());
-        leaveApplication.setToDate(submitLeaveDto.getToDate());
-        leaveApplication.setLeaveCategory(submitLeaveDto.getLeaveCategory());
-        leaveApplication.setAdditionalReasons(submitLeaveDto.getAdditionalReasons());
-        leaveApplication.setWorkDissemination(submitLeaveDto.getWorkDissemination());
-        leaveApplication.setContactDetails(submitLeaveDto.getContactDetails());
-        leaveApplication.setStatus(submitLeaveDto.getStatus());
-        return leaveApplication;
+        submitLeaveDto.setFromDate(insubmitLeaveDto.getFromDate());
+        submitLeaveDto.setToDate(insubmitLeaveDto.getToDate());
+        submitLeaveDto.setLeaveCategory(insubmitLeaveDto.getLeaveCategory());
+        submitLeaveDto.setAdditionalReasons(insubmitLeaveDto.getAdditionalReasons());
+        submitLeaveDto.setWorkDissemination(insubmitLeaveDto.getWorkDissemination());
+        submitLeaveDto.setContactDetails(insubmitLeaveDto.getContactDetails());
+        //submitLeaveDto.setStatus(insubmitLeaveDto.getStatus());
+        return submitLeaveDto;
     }
     @Override
     @Transactional
