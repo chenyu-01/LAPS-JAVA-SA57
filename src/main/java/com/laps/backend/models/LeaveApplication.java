@@ -37,5 +37,4 @@ public class LeaveApplication {
     @ManyToOne
     @JoinColumn(name = "employee_id", nullable = false)
     private Employee employee; // Employee who applied for the leave
-    // Standard getters and setters
 }
