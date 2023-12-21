@@ -10,7 +10,7 @@ import lombok.AccessLevel;
 import lombok.Getter;
 import lombok.Setter;
 
-import java.util.Date;
+import java.time.LocalDateTime;
 
 @Getter @Setter
 @Entity
@@ -19,9 +19,9 @@ public class LeaveApplication {
     @Setter(AccessLevel.NONE) // disable setter for id
     @GeneratedValue(strategy = GenerationType.AUTO)
     private Long id;
-    private Date startDate;
+    private LocalDateTime startDate;
     @Column(nullable = false)
-    private Date endDate;
+    private LocalDateTime endDate;
     @Column(nullable = false)
     private String type; // e.g., Annual, Medical, Compensation, etc.
     @Column(nullable = false)
