@@ -90,13 +90,6 @@ public class LapsBackendApplication {
 			user4.setRole("Admin");
 			userRepository.save(user4);
 
-			User user3 = new Manager();
-			user3.setEmail("testuser3@gmail.com");
-			user3.setPassword("password123");
-			user3.setName("Test User 3");
-			user3.setRole("Manager");
-			userRepository.save(user3);
-
 			PublicHolidays P1 = publicHolidayRepository
 					.save(new PublicHolidays(LocalDate.parse("2024-01-01"), "New Year"));
 			PublicHolidays P2 = publicHolidayRepository
