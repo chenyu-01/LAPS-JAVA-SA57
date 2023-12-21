@@ -26,6 +26,7 @@ public interface LeaveApplicationService {
     Optional<List<LeaveApplication>> getEmployeeAllApplications(Employee employee);
     LeaveApplication saveApplication(LeaveApplication leaveApplication);
 
+    List<LeaveApplication> fuzzySearchApplication(String[] keywords);
     List<LeaveApplication> getAllApprovedApplications();
 
     List<LeaveApplication> getAllRejectedApplications();
