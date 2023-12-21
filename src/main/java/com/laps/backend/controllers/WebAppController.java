@@ -12,7 +12,7 @@ public class WebAppController {
         return "forward:/";
     }
 
-    // Redirect /test to /dashboard
+   
     @RequestMapping(value = "/test")
     public String test() {
         return "Test";
