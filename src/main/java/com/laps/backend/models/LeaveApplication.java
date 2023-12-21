@@ -20,15 +20,19 @@ public class LeaveApplication {
     @GeneratedValue(strategy = GenerationType.AUTO)
     private Long id;
     private Date startDate;
+    @Column(nullable = false)
     private Date endDate;
+    @Column(nullable = false)
     private String type; // e.g., Annual, Medical, Compensation, etc.
     @Column(nullable = false)
     @Pattern(regexp = "Applied|Approved|Rejected|Deleted|Cancelled|Updated", message = "Status must be Applied, Approved, Rejected, Deleted, Cancelled, or Updated")
     private String status; // e.g., Applied, Approved, Rejected, Deleted, Cancelled，Updated
     private String comment; // comment for the leave application
+    @Column(nullable = false)
     private String reason; // Reason for the leave
-
     private String contactInfo; // Contact information if overseas leave
+    @Column(nullable = false)
+    private boolean isOverseas; // Whether the leave is overseas
 
     @ManyToOne
     @JoinColumn(name = "employee_id", nullable = false)
