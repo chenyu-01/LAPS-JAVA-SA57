@@ -13,6 +13,7 @@ import com.laps.backend.repositories.LeaveTypeRepository;
 import com.laps.backend.repositories.PublicHolidayRepository;
 
 import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.util.Date;
 import java.util.List;
 
@@ -71,15 +72,28 @@ public class LapsBackendApplication {
 			List<Employee> employees = List.of((Employee) user2, (Employee) user3);
 			((Manager) user1).setSubordinates(employees);
 			userRepository.save(user1);
-			for (int i = 0; i < 10; i++){
+			for (int i = 0; i < 5; i++){
 				LeaveApplication leaveApplication1 = new LeaveApplication();
 				leaveApplication1.setEmployee((Employee) user2);
-				leaveApplication1.setStartDate(Date.from(new Date().toInstant().plusSeconds(86400))); // tomorrow
-				leaveApplication1.setEndDate(Date.from(new Date().toInstant().plusSeconds(86400 * 2))); // day after tomorrow
+				leaveApplication1.setStartDate(LocalDateTime.now()); // today
+				leaveApplication1.setEndDate(LocalDateTime.now().plusDays(1)); // tomorrow
 				leaveApplication1.setReason("Sick");
 				leaveApplication1.setStatus("Applied");
 				leaveApplication1.setType("Annual");
+				leaveApplication1.setOverseas(false);
 				leaveRepository.save(leaveApplication1);
+			}
+
+			for (int i = 0 ; i < 5; i++){
+				LeaveApplication leaveApplication2 = new LeaveApplication();
+				leaveApplication2.setEmployee((Employee) user3);
+				leaveApplication2.setStartDate(LocalDateTime.now().plusDays(1)); // tomorrow
+				leaveApplication2.setEndDate(LocalDateTime.now().plusDays(2)); // day after tomorrow
+				leaveApplication2.setReason("Sick");
+				leaveApplication2.setStatus("Approved");
+				leaveApplication2.setType("Annual");
+				leaveApplication2.setOverseas(false);
+				leaveRepository.save(leaveApplication2);
 			}
 
 

@@ -10,7 +10,7 @@ import lombok.AccessLevel;
 import lombok.Getter;
 import lombok.Setter;
 
-import java.util.Date;
+import java.time.LocalDateTime;
 
 @Getter @Setter
 @Entity
@@ -19,19 +19,22 @@ public class LeaveApplication {
     @Setter(AccessLevel.NONE) // disable setter for id
     @GeneratedValue(strategy = GenerationType.AUTO)
     private Long id;
-    private Date startDate;
-    private Date endDate;
+    private LocalDateTime startDate;
+    @Column(nullable = false)
+    private LocalDateTime endDate;
+    @Column(nullable = false)
     private String type; // e.g., Annual, Medical, Compensation, etc.
     @Column(nullable = false)
     @Pattern(regexp = "Applied|Approved|Rejected|Deleted|Cancelled|Updated", message = "Status must be Applied, Approved, Rejected, Deleted, Cancelled, or Updated")
     private String status; // e.g., Applied, Approved, Rejected, Deleted, Cancelled，Updated
     private String comment; // comment for the leave application
+    @Column(nullable = false)
     private String reason; // Reason for the leave
-
     private String contactInfo; // Contact information if overseas leave
+    @Column(nullable = false)
+    private boolean isOverseas; // Whether the leave is overseas
 
     @ManyToOne
     @JoinColumn(name = "employee_id", nullable = false)
     private Employee employee; // Employee who applied for the leave
-    // Standard getters and setters
 }
