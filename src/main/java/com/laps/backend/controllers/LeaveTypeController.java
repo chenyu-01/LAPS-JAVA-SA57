@@ -70,10 +70,10 @@ public class LeaveTypeController {
 	    System.out.println(existingLeaveType.getId()+ " " + existingLeaveType.getName() +  " " + existingLeaveType.getRoleName() + " "+ existingLeaveType.getEntitledNum());
 		String message = "LeaveType was succesfully updated";
 		
-		leavetypeValidator.validate(existingLeaveType, bindingResult);
+		//leavetypeValidator.validate(existingLeaveType, bindingResult);
         if (bindingResult.hasErrors()) {
 	        System.out.println("Validation errors: " + bindingResult.getAllErrors());
-	        model.addAttribute("leaveType", existingLeaveType);
+	       // model.addAttribute("leaveType", existingLeaveType);
 //	        model.addAttribute("BindingResult", bindingResult);
 //	        model.addAttribute("errors", bindingResult);
 	        return "leavetype-edit";

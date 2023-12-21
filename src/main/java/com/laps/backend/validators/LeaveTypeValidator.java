@@ -28,18 +28,18 @@ public class LeaveTypeValidator implements Validator {
 			errors.rejectValue("entitledNum", "error.entitledNum", "Medical leave cannot be more than 60");
 		}
 
-		if (leavetype.getName() == LeaveTypeEnum.MEDICAL && leavetype.getEntitledNum() > 60) {
+		if ((LeaveTypeEnum)leavetype.getName() == LeaveTypeEnum.MEDICAL && leavetype.getEntitledNum() > 60) {
 			errors.rejectValue("entitledNum", "error.entitledNum", "Medical leave cannot be more than 60");
 		} 
 		
-		if (leavetype.getName() == LeaveTypeEnum.ANNUAL && leavetype.getRoleName().equalsIgnoreCase("Admin")
-				&& leavetype.getEntitledNum() < 18) {
-			errors.rejectValue("entitledNum", "error.entitledNum", "Admin is entitled for a minimum of 18 day annual leave");
+		if ((LeaveTypeEnum)leavetype.getName() == LeaveTypeEnum.ANNUAL && leavetype.getRoleName().equalsIgnoreCase("Admin")
+				&& leavetype.getEntitledNum() < 14) {
+			errors.rejectValue("entitledNum", "error.entitledNum", "Admin is entitled for a minimum of 14 day annual leave");
 		}
 
-		if (leavetype.getName() == LeaveTypeEnum.ANNUAL && !leavetype.getRoleName().equalsIgnoreCase("Admin")
-				&& leavetype.getEntitledNum() < 14) {
-			errors.rejectValue("entitledNum", "error.entitledNum", "non-Admin is entitled for a minimum of 14 day annual leave");
+		if ((LeaveTypeEnum)leavetype.getName() == LeaveTypeEnum.ANNUAL && !leavetype.getRoleName().equalsIgnoreCase("Admin")
+				&& leavetype.getEntitledNum() < 18) {
+			errors.rejectValue("entitledNum", "error.entitledNum", "Employee is entitled for a minimum of 18 day annual leave");
 
 		}
 
