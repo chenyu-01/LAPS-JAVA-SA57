@@ -13,5 +13,4 @@ public interface LeaveTypeRepository extends JpaRepository<LeaveType, Integer> {
 	Optional<LeaveType> findById(@Param("id") Integer id);
 
 	LeaveType save(LeaveType leaveType);
-
 }
