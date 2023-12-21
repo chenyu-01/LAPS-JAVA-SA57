@@ -16,6 +16,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
@@ -149,20 +150,21 @@ public class LeaveApplicationController {
     @PutMapping("/update/{id}")
     public ResponseEntity<?> updateEmployeeApplication(@PathVariable("id") Long inid,@RequestBody Map<String,String> leaveApplicationBody) throws ParseException {
         Optional<Employee> optEmployee = employeeService.findById(inid);
+        SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss.SSS");
         if(optEmployee.isPresent()){
 
             Long id = Long.parseLong(leaveApplicationBody.get("id"));
             Optional<LeaveApplication> optleaveApplication = leaveApplicationService.findById(id,inid);
             if (optleaveApplication.isPresent()) {
                 LeaveApplication leaveApplication = optleaveApplication.get();
-                Date startDate = DateFormat.getDateInstance().parse(leaveApplicationBody.get("StartDate"));
-                Date endDate = DateFormat.getDateInstance().parse(leaveApplicationBody.get("EndDate"));
+                Date startDate = sdf.parse(leaveApplicationBody.get("startDate"));
+                Date endDate = sdf.parse(leaveApplicationBody.get("endDate"));
                 leaveApplication.setStartDate(startDate);
                 leaveApplication.setEndDate(endDate);
-                leaveApplication.setType(leaveApplicationBody.get("Type"));
-                leaveApplication.setStatus(leaveApplicationBody.get("Status"));
-                leaveApplication.setComment(leaveApplicationBody.get("Comment"));
-                leaveApplication.setReason(leaveApplicationBody.get("Reason"));
+                leaveApplication.setType(leaveApplicationBody.get("type"));
+                leaveApplication.setComment(leaveApplicationBody.get("comment"));
+                leaveApplication.setReason(leaveApplicationBody.get("reason"));
+                leaveApplicationService.saveApplication(leaveApplication);
                 LeaveApplicationDTO leaveApplicationDTO = new LeaveApplicationDTO(leaveApplication);
                 return new
                         ResponseEntity<LeaveApplicationDTO>(leaveApplicationDTO, HttpStatus.OK);
@@ -189,7 +191,8 @@ public class LeaveApplicationController {
             Optional<LeaveApplication> optleaveApplication = leaveApplicationService.findById(id,inid);
             if (optleaveApplication.isPresent()) {
                 LeaveApplication leaveApplication = optleaveApplication.get();
-                leaveApplication.setStatus("Canceled");
+                leaveApplication.setStatus("Cancelled");
+                leaveApplicationService.saveApplication(leaveApplication);
                 LeaveApplicationDTO leaveApplicationDTO = new LeaveApplicationDTO(leaveApplication);
                 return new
                         ResponseEntity<LeaveApplicationDTO>(leaveApplicationDTO, HttpStatus.OK);
@@ -217,6 +220,7 @@ public class LeaveApplicationController {
             if (optleaveApplication.isPresent()) {
                 LeaveApplication leaveApplication = optleaveApplication.get();
                 leaveApplication.setStatus("Deleted");
+                leaveApplicationService.saveApplication(leaveApplication);
                 LeaveApplicationDTO leaveApplicationDTO = new LeaveApplicationDTO(leaveApplication);
                 return new
                         ResponseEntity<LeaveApplicationDTO>(leaveApplicationDTO, HttpStatus.OK);
@@ -232,5 +236,34 @@ public class LeaveApplicationController {
 
 
     }
+
+    @PutMapping("submit/{id}")
+    public ResponseEntity<?> submitEmployeeApplication(@PathVariable("id") Long inid,@RequestBody Map<String,String> leaveApplicationBody) throws ParseException {
+        Optional<Employee> optEmployee = employeeService.findById(inid);
+        SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss.SSS");
+        if(optEmployee.isPresent()){
+            LeaveApplication leaveApplication = new LeaveApplication();
+            Date startDate = sdf.parse(leaveApplicationBody.get("startDate"));
+            Date endDate = sdf.parse(leaveApplicationBody.get("endDate"));
+            leaveApplication.setStartDate(startDate);
+            leaveApplication.setEndDate(endDate);
+            leaveApplication.setType(leaveApplicationBody.get("type"));
+            leaveApplication.setComment(leaveApplicationBody.get("comment"));
+            leaveApplication.setReason(leaveApplicationBody.get("reason"));
+            leaveApplication.setStatus("Applied");
+            leaveApplication.setContactInfo(leaveApplicationBody.get("contactInfo"));
+            leaveApplication.setEmployee(optEmployee.get());
+            leaveApplicationService.saveApplication(leaveApplication);
+            LeaveApplicationDTO leaveApplicationDTO = new LeaveApplicationDTO(leaveApplication);
+            return new
+                    ResponseEntity<LeaveApplicationDTO>(leaveApplicationDTO, HttpStatus.OK);
+        } else {
+            return new
+                    ResponseEntity<Employee>(HttpStatus.NOT_FOUND);
+        }
+
+
+    }
+
 }
 
