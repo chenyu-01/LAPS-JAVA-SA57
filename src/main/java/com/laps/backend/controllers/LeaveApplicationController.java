@@ -164,6 +164,7 @@ public class LeaveApplicationController {
                 leaveApplication.setType(leaveApplicationBody.get("type"));
                 leaveApplication.setComment(leaveApplicationBody.get("comment"));
                 leaveApplication.setReason(leaveApplicationBody.get("reason"));
+                leaveApplication.setStatus("Updated");
                 leaveApplicationService.saveApplication(leaveApplication);
                 LeaveApplicationDTO leaveApplicationDTO = new LeaveApplicationDTO(leaveApplication);
                 return new
