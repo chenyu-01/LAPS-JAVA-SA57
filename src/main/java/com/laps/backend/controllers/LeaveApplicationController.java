@@ -237,6 +237,33 @@ public class LeaveApplicationController {
 
     }
 
+    @PutMapping("submit/{id}")
+    public ResponseEntity<?> submitEmployeeApplication(@PathVariable("id") Long inid,@RequestBody Map<String,String> leaveApplicationBody) throws ParseException {
+        Optional<Employee> optEmployee = employeeService.findById(inid);
+        SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss.SSS");
+        if(optEmployee.isPresent()){
+            LeaveApplication leaveApplication = new LeaveApplication();
+            Date startDate = sdf.parse(leaveApplicationBody.get("startDate"));
+            Date endDate = sdf.parse(leaveApplicationBody.get("endDate"));
+            leaveApplication.setStartDate(startDate);
+            leaveApplication.setEndDate(endDate);
+            leaveApplication.setType(leaveApplicationBody.get("type"));
+            leaveApplication.setComment(leaveApplicationBody.get("comment"));
+            leaveApplication.setReason(leaveApplicationBody.get("reason"));
+            leaveApplication.setStatus("Applied");
+            leaveApplication.setContactInfo(leaveApplicationBody.get("contactInfo"));
+            leaveApplication.setEmployee(optEmployee.get());
+            leaveApplicationService.saveApplication(leaveApplication);
+            LeaveApplicationDTO leaveApplicationDTO = new LeaveApplicationDTO(leaveApplication);
+            return new
+                    ResponseEntity<LeaveApplicationDTO>(leaveApplicationDTO, HttpStatus.OK);
+        } else {
+            return new
+                    ResponseEntity<Employee>(HttpStatus.NOT_FOUND);
+        }
+
+
+    }
 
 }
 
