@@ -38,7 +38,7 @@ public class LeaveApplicationController {
         this.employeeService = employeeService;
         this.userService = userService;
     }
-
+    // Get all leave applications
     @GetMapping("/applied")
     public ResponseEntity<List<LeaveApplicationDTO>> getAllAppliedApplications() {
         List<LeaveApplication> applications = leaveApplicationService.getAllAppliedApplications();
@@ -123,7 +123,7 @@ public class LeaveApplicationController {
         return ResponseEntity.ok(applicationDTOS);
     }
 
-    @GetMapping("/find/{id}")
+    @GetMapping("/findemployee/{id}")
     public ResponseEntity<?> findEmployeeApplication(@PathVariable("id") Long id){
         Optional<Employee> optEmployee = employeeService.findById(id);
         if (optEmployee.isPresent()){
@@ -211,12 +211,12 @@ public class LeaveApplicationController {
 
 
     @PutMapping("/delete/{id}")
-    public ResponseEntity<?> deleteEmployeeApplication(@PathVariable("id") Long inid,@RequestBody Map<String,String> leaveApplicationBody) throws ParseException {
-        Optional<Employee> optEmployee = employeeService.findById(inid);
+    public ResponseEntity<?> deleteEmployeeApplication(@PathVariable("employeeId") Long employeeId,@RequestBody Map<String,String> leaveApplicationBody) throws ParseException {
+        Optional<Employee> optEmployee = employeeService.findById(employeeId);
         if(optEmployee.isPresent()){
 
             Long id = Long.parseLong(leaveApplicationBody.get("id"));
-            Optional<LeaveApplication> optleaveApplication = leaveApplicationService.findById(id,inid);
+            Optional<LeaveApplication> optleaveApplication = leaveApplicationService.findById(id,employeeId);
             if (optleaveApplication.isPresent()) {
                 LeaveApplication leaveApplication = optleaveApplication.get();
                 leaveApplication.setStatus("Deleted");
