@@ -80,7 +80,7 @@ public class LapsBackendApplication {
 				leaveApplication1.setReason("Sick");
 				leaveApplication1.setStatus("Applied");
 				leaveApplication1.setType("Annual");
-				leaveApplication1.setOverseas(false);
+				leaveApplication1.setIsOverseas(false);
 				leaveRepository.save(leaveApplication1);
 			}
 
@@ -92,7 +92,7 @@ public class LapsBackendApplication {
 				leaveApplication2.setReason("Sick");
 				leaveApplication2.setStatus("Approved");
 				leaveApplication2.setType("Annual");
-				leaveApplication2.setOverseas(false);
+				leaveApplication2.setIsOverseas(false);
 				leaveRepository.save(leaveApplication2);
 			}
 

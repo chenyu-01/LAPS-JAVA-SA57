@@ -73,6 +73,12 @@
                                     <option value="true">Yes</option>
                                 </select>
                             </div>
+                            <div class="mb-4">
+                                <label class="block text-gray-700 text-sm font-bold mb-2" for="isOverseas">
+                                    Work Dissemination (if applicable)
+                                </label>
+                                <input type="text" id="workDissemination" class="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline" placeholder="Work assembly info">
+                            </div>
                             <div class="flex items-center justify-center">
                                 <button class="bg-indigo-400 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded focus:outline-none focus:shadow-outline w-full" type="submit">
                                     Submit Application
@@ -100,15 +106,17 @@
         const json_endDate = document.getElementById("endDate").value;
         const json_reason = document.getElementById("reason").value;
         const json_contactInfo = document.getElementById("contactInfo").value;
+        const json_isOverseas = document.getElementById("isOverseas").value;
+        const json_workDissemination = document.getElementById("workDissemination").value;
         const xhr = new XMLHttpRequest();
-        const isOverseas = document.getElementById("isOverseas").value;
         const data = {
             type: json_leaveType,
             startDate: json_startDate,
             endDate: json_endDate,
             reason: json_reason,
             contactInfo : json_contactInfo,
-            isOverseas: isOverseas
+            isOverseas: json_isOverseas,
+            workDissemination: json_workDissemination
         }
         const jsonData = JSON.stringify(data);
 
@@ -121,13 +129,31 @@
                     window.location.href = "/dashboard";
                 }
                 else {
-                    alert(xhr.responseText);
+                    handleErrorResponse(xhr.responseText)
                 }
             }
         }
         xhr.send(jsonData);
 
         return false;
+    }
+
+    function handleErrorResponse(responseText) {
+        try {
+            const responseObj = JSON.parse(responseText);
+            let errorMessage = '';
+            if (Array.isArray(responseObj)) {
+                responseObj.forEach((error) => {
+                    errorMessage += error.defaultMessage + '\n'; // Add each error message to the alert
+                });
+            } else {
+                // If the error structure is different, adjust accordingly
+                errorMessage = responseObj.message || 'An error occurred';
+            }
+            alert(errorMessage);
+        } catch (e) {
+            alert('An error occurred while processing the response.');
+        }
     }
 
 </script>
