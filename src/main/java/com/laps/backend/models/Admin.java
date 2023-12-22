@@ -12,27 +12,17 @@ public class Admin extends User {
     }
 
     public Admin(User user) {
-        super();
-        this.setName(user.getName());
-        this.setEmail(user.getEmail());
-        this.setPassword(user.getPassword());
-        this.setRole("Admin");
+        super(user.getName(), user.getEmail(), user.getPassword(), "Admin");
+        this.setId(user.getId());
     }
 
     public Admin(Employee employee) {
-        super();
-        this.setName(employee.getName());
-        this.setEmail(employee.getEmail());
-        this.setPassword(employee.getPassword());
-        this.setRole("Admin");
+        super(employee.getName(), employee.getEmail(), employee.getPassword(), "Admin");
+        this.setId(employee.getId());
     }
 
     public Admin(Manager manager) {
-        super();
-        this.setName(manager.getName());
-        this.setEmail(manager.getEmail());
-        this.setPassword(manager.getPassword());
-        this.setRole("Admin");
+        super(manager.getName(), manager.getEmail(), manager.getPassword(), "Admin");
+        this.setId(manager.getId());
     }
-
 }
