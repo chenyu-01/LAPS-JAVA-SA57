@@ -4,7 +4,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Leave Application Form</title>
-    <link th:href="@{css/styles.css}" rel="stylesheet" type="text/css" />
+    <link th:href="@{/css/styles.css}" rel="stylesheet" type="text/css" />
 </head>
 <body class="bg-gray-100">
     <div class="container mx-auto p-8">
@@ -18,7 +18,7 @@
                             <span class="text-sm font-bold">User</span>
                         </div>
                     </div>
-                    <img th:src="@{img/application.png}" alt="drawing" class="my-4 hidden md:block">
+                    <img th:src="@{/img/application.png}" alt="drawing" class="my-4 hidden md:block">
                     <div class="flex items-center justify-center my-5 w-full">
                         <div class="bg-red-300 hover:bg-red-500 text-white text-center font-bold py-2 px-4 rounded focus:outline-none focus:shadow-outline w-full">
                             <a href="/dashboard">go back to dashboard</a>
@@ -29,11 +29,7 @@
                 <div class="w-full p-4">
                     <div class="relative">
                         <div class="text-lg text-gray-700 font-semibold">Leave Application Form</div>
-
-                        <form class="mt-4" id="applicationForm" th:action="@{api/applications/submit/+@{id}}"  method="post" onsubmit="return submitForm(event)">
-
-
-
+                        <form class="mt-4" id="applicationForm" th:action="@{/api/applications/submit/{id}(id=${id})}" method="post" onsubmit="return submitForm(event);">
                         <div class="mb-4">
                                 <label class="block text-gray-700 text-sm font-bold mb-2" for="leaveType">
                                     Select Leave Type
@@ -68,6 +64,15 @@
                                 </label>
                                 <input type="text" id="contactInfo" class="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline" placeholder="Phone number or email">
                             </div>
+                            <div class="mb-4">
+                                <label class="block text-gray-700 text-sm font-bold mb-2" for="isOverseas">
+                                    Are you applying for Overseas Leave?
+                                </label>
+                                <select id="isOverseas" class="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline">
+                                    <option value="false">No</option>
+                                    <option value="true">Yes</option>
+                                </select>
+                            </div>
                             <div class="flex items-center justify-center">
                                 <button class="bg-indigo-400 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded focus:outline-none focus:shadow-outline w-full" type="submit">
                                     Submit Application
@@ -86,30 +91,41 @@
 
     function submitForm(event){
         event.preventDefault();
-        var form = document.getElementById("applicationForm");
-        var actionUrl = form.getAttribute("action");
+        const form = document.getElementById("applicationForm");
+        const actionUrl = form.getAttribute("action");
         console.log(actionUrl);
-
-
         //const id = 2;
         const json_leaveType = document.getElementById("leaveType").value ;
         const json_startDate = document.getElementById("startDate").value;
         const json_endDate = document.getElementById("endDate").value;
         const json_reason = document.getElementById("reason").value;
         const json_contactInfo = document.getElementById("contactInfo").value;
-        const new_request = new XMLHttpRequest();
+        const xhr = new XMLHttpRequest();
+        const isOverseas = document.getElementById("isOverseas").value;
         const data = {
             type: json_leaveType,
             startDate: json_startDate,
             endDate: json_endDate,
             reason: json_reason,
-            contactInfo : json_contactInfo
+            contactInfo : json_contactInfo,
+            isOverseas: isOverseas
         }
         const jsonData = JSON.stringify(data);
-        var url = 'http://localhost:8080/' + actionUrl;
-        new_request.open('post',url,true);
-        new_request.setRequestHeader('Content-Type','application/json');
-        new_request.send(jsonData);
+
+        xhr.open('post',actionUrl,true);
+        xhr.setRequestHeader('Content-Type','application/json');
+        xhr.onreadystatechange = function(){
+            if(xhr.readyState === 4 ){
+                if(xhr.status === 200){
+                    alert(xhr.responseText);
+                    window.location.href = "/dashboard";
+                }
+                else {
+                    alert(xhr.responseText);
+                }
+            }
+        }
+        xhr.send(jsonData);
 
         return false;
     }
