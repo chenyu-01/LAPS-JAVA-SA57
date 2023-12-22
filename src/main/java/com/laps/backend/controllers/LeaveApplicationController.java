@@ -39,7 +39,7 @@ public class LeaveApplicationController {
         this.userService = userService;
     }
 
-    @GetMapping("/applied")
+    //@GetMapping("/applied")
     public ResponseEntity<List<LeaveApplicationDTO>> getAllAppliedApplications() {
         List<LeaveApplication> applications = leaveApplicationService.getAllAppliedApplications();
         if (applications.isEmpty()) {

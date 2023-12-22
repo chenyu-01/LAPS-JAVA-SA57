@@ -8,6 +8,7 @@ import com.laps.backend.repositories.EmployeeReposity;
 import com.laps.backend.repositories.ManagerRepository;
 import com.laps.backend.repositories.UserRepository;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 
 import java.util.*;
@@ -67,6 +68,10 @@ public class AdminServiceImpl implements AdminService {
                 yield managerRepository.save(manager);
             }
             case "Employee" -> {
+                if (updatedUser instanceof Employee) {
+                    deleteUser(id);
+                    yield employeeRepository.save((Employee) updatedUser);
+                }
                 Employee employee = new Employee(updatedUser);
                 deleteUser(id);
                 yield employeeRepository.save(employee);
@@ -81,7 +86,69 @@ public class AdminServiceImpl implements AdminService {
     }
 
     @Override
+    public List<User> getUsersByRole(String role) {
+        return userRepository.findByRole(role);
+    }
+
+    @Override
     public User createUser(User newUser) {
+        if (userRepository.existsByEmail(newUser.getEmail())) {
+            throw new IllegalArgumentException("User with email " + newUser.getEmail() + " already exists");
+        }
         return userRepository.save(newUser);
+    }
+    @Override
+    public User createAdmin(User newUser) {
+        if (userRepository.existsByEmail(newUser.getEmail())) {
+            throw new IllegalArgumentException("User with email " + newUser.getEmail() + " already exists");
+        }
+        Admin admin = new Admin(newUser);
+        return userRepository.save(admin);
+    }
+
+    public Manager getManagerByName(String managerName) {
+        return managerRepository.findByName(managerName);
+    }
+@Override
+    public User createEmployee(User newUser, Manager manager) {
+        if (userRepository.existsByEmail(newUser.getEmail())) {
+            throw new IllegalArgumentException("User with email " + newUser.getEmail() + " already exists");
+        }
+        Employee employee = new Employee(newUser);
+        employee.setManager(manager);
+        return employeeRepository.save(employee);
+    }
+
+    @Override
+    public User createEmployee(User newUser) {
+        if (userRepository.existsByEmail(newUser.getEmail())) {
+            throw new IllegalArgumentException("User with email " + newUser.getEmail() + " already exists");
+        }
+        Employee employee = new Employee(newUser);
+        return employeeRepository.save(employee);
+    }
+
+    @Override
+    public User createManager(User newUser) {
+        if (userRepository.existsByEmail(newUser.getEmail())) {
+            throw new IllegalArgumentException("User with email " + newUser.getEmail() + " already exists");
+        }
+        Manager manager = new Manager(newUser);
+        return managerRepository.save(manager);
+    }
+
+    public User getManagerByEmployee(Long id) {
+        Optional<Employee> employee = employeeRepository.findById(id);
+        if (employee.isPresent()) {
+            return employee.get().getManager();
+        }else
+            throw new IllegalArgumentException("Employee not found with id: " + id);
+
+    }
+
+    public User updateUser(User user) {
+        if (user instanceof Employee)
+            return employeeRepository.save((Employee) user);
+        else return userRepository.save(user);
     }
 }
