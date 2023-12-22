@@ -1,10 +1,7 @@
 package com.laps.backend.models;
 
 import com.laps.backend.controllers.AdminController;
-import jakarta.persistence.Entity;
-import jakarta.persistence.JoinColumn;
-import jakarta.persistence.ManyToOne;
-import jakarta.persistence.OneToMany;
+import jakarta.persistence.*;
 import lombok.Getter;
 import lombok.Setter;
 
@@ -17,7 +14,7 @@ public class Employee extends User{
     @ManyToOne
     @JoinColumn(name = "manager_id")
     private Manager manager; // explicitly set manager_id foreign key column in employee table
-    @OneToMany(mappedBy = "employee")
+    @OneToMany(mappedBy = "employee",cascade = CascadeType.REMOVE)
     private List<LeaveApplication> leaveApplications;
     public Employee() {
         super();
@@ -25,27 +22,18 @@ public class Employee extends User{
 
     // constructor for converting User to Employee
     public Employee(User user) {
-        super();
-        this.setName(user.getName());
-        this.setEmail(user.getEmail());
-        this.setPassword(user.getPassword());
-        this.setRole("Employee");
+        super(user.getName(), user.getEmail(), user.getPassword(), "Employee");
+        this.setId(user.getId());
     }
 
     // constructor for converting Manager to Employee
     public Employee(Manager manager) {
-        super();
-        this.setName(manager.getName());
-        this.setEmail(manager.getEmail());
-        this.setPassword(manager.getPassword());
-        this.setRole("Employee");
+        super(manager.getName(), manager.getEmail(), manager.getPassword(), "Employee");
+        this.setId(manager.getId());
     }
 
     public Employee(Admin admin) {
-        super();
-        this.setName(admin.getName());
-        this.setEmail(admin.getEmail());
-        this.setPassword(admin.getPassword());
-        this.setRole("Employee");
+        super(admin.getName(), admin.getEmail(), admin.getPassword(), "Employee");
+        this.setId(admin.getId());
     }
 }

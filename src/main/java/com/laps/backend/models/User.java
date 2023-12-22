@@ -31,6 +31,18 @@ public class User {
     private String password;
 
     // Relationships e.g., OneToMany for leave applications
+    public  User() {
+        super();
+    }
+    public User(String name, String email, String password, String role) {
+        this.setEmail(email);
+        this.setName(name);
+        this.setPassword(password);
+        this.setRole(role);
+    }
 
+    protected void setId(Long id) {
+        this.id = id;
+    }
 }
 
