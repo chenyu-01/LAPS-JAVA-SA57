@@ -12,11 +12,6 @@ public class WebAppController {
         return "forward:/";
     }
 
-   
-    @RequestMapping(value = "/test")
-    public String test() {
-        return "Test";
-    }
 
     @RequestMapping(value = "/leave")
     public String leave() {
