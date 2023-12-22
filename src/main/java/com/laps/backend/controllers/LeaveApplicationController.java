@@ -203,21 +203,27 @@ public class LeaveApplicationController {
     }
 
     @PostMapping("/submit/{id}")
-    public ResponseEntity<?> submitEmployeeApplication(@PathVariable("id") Long inid,@RequestBody Map<String,String>  leaveApplicationBody) throws ParseException {
+    public ResponseEntity<?> submitEmployeeApplication(@PathVariable("id") Long inid,@RequestBody Map<String,String> leaveApplicationBody) throws ParseException {
         Optional<Employee> optEmployee = employeeService.findById(inid);
         if(!optEmployee.isPresent()){
             return new ResponseEntity<String>("Employee Not Found",HttpStatus.NOT_FOUND);
         }
         LeaveApplication leaveApplication = new LeaveApplication();
-        LocalDateTime startDate = LocalDateTime.parse(leaveApplicationBody.get("startDate"),df);
-        LocalDateTime endDate = LocalDateTime.parse(leaveApplicationBody.get("endDate"),df);
-        leaveApplication.setStartDate(startDate);
-        leaveApplication.setEndDate(endDate);
+        LocalDateTime startDate;
+        LocalDateTime endDate;
+        try {
+            startDate = LocalDateTime.parse(leaveApplicationBody.get("startDate"), df);
+            endDate = LocalDateTime.parse(leaveApplicationBody.get("endDate"), df);
+            leaveApplication.setStartDate(startDate);
+            leaveApplication.setEndDate(endDate);
+        } catch (Exception e) {
+            return new ResponseEntity<String>("Invalid Date Format", HttpStatus.NOT_ACCEPTABLE);
+        }
         leaveApplication.setType(leaveApplicationBody.get("type"));
         leaveApplication.setReason(leaveApplicationBody.get("reason"));
         leaveApplication.setStatus("Applied");
         leaveApplication.setOverseas(Boolean.parseBoolean(leaveApplicationBody.get("isOverseas")));
-        if(leaveApplicationBody.get("contactInfo") == null && leaveApplicationBody.get("isOverseas").equals("true")) {
+        if(leaveApplicationBody.get("contactInfo") == "" && leaveApplicationBody.get("isOverseas").equals("true")) {
             return new ResponseEntity<String>("Contact Information is Required for Overseas Leave", HttpStatus.NOT_ACCEPTABLE);
         }
         leaveApplication.setContactInfo(leaveApplicationBody.get("contactInfo"));
