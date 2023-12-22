@@ -29,8 +29,12 @@
                 <div class="w-full p-4">
                     <div class="relative">
                         <div class="text-lg text-gray-700 font-semibold">Leave Application Form</div>
-                        <form class="mt-4">
-                            <div class="mb-4">
+
+                        <form class="mt-4" id="applicationForm" th:action="@{api/applications/submit/+@{id}}"  method="post" onsubmit="return submitForm(event)">
+
+
+
+                        <div class="mb-4">
                                 <label class="block text-gray-700 text-sm font-bold mb-2" for="leaveType">
                                     Select Leave Type
                                 </label>
@@ -44,13 +48,13 @@
                                 <label class="block text-gray-700 text-sm font-bold mb-2" for="startDate">
                                     Start Date
                                 </label>
-                                <input type="date" id="startDate" class="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline">
+                                <input type="datetime-local" id="startDate" class="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline">
                             </div>
                             <div class="mb-4">
                                 <label class="block text-gray-700 text-sm font-bold mb-2" for="endDate">
                                     End Date
                                 </label>
-                                <input type="date" id="endDate" class="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline">
+                                <input type="datetime-local" id="endDate" class="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline">
                             </div>
                             <div class="mb-4">
                                 <label class="block text-gray-700 text-sm font-bold mb-2" for="reason">
@@ -69,6 +73,7 @@
                                     Submit Application
                                 </button>
                             </div>
+
                         </form>
                     </div>
                 </div>
@@ -76,4 +81,39 @@
         </div>
     </div>
 </body>
+
+<script >
+
+    function submitForm(event){
+        event.preventDefault();
+        var form = document.getElementById("applicationForm");
+        var actionUrl = form.getAttribute("action");
+        console.log(actionUrl);
+
+
+        //const id = 2;
+        const json_leaveType = document.getElementById("leaveType").value ;
+        const json_startDate = document.getElementById("startDate").value;
+        const json_endDate = document.getElementById("endDate").value;
+        const json_reason = document.getElementById("reason").value;
+        const json_contactInfo = document.getElementById("contactInfo").value;
+        const new_request = new XMLHttpRequest();
+        const data = {
+            type: json_leaveType,
+            startDate: json_startDate,
+            endDate: json_endDate,
+            reason: json_reason,
+            contactInfo : json_contactInfo
+        }
+        const jsonData = JSON.stringify(data);
+        var url = 'http://localhost:8080/' + actionUrl;
+        new_request.open('post',url,true);
+        new_request.setRequestHeader('Content-Type','application/json');
+        new_request.send(jsonData);
+
+        return false;
+    }
+
+</script>
 </html>
+
