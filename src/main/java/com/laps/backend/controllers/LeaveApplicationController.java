@@ -226,7 +226,7 @@ public class LeaveApplicationController {
         leaveApplication.setEmployee(optEmployee.get());
         leaveApplicationService.saveApplication(leaveApplication);
         LeaveApplicationDTO leaveApplicationDTO = new LeaveApplicationDTO(leaveApplication);
-        return new ResponseEntity<LeaveApplicationDTO>(leaveApplicationDTO, HttpStatus.OK);
+        return new ResponseEntity<String>("Successfully Submitted Application", HttpStatus.OK);
     }
 
 
