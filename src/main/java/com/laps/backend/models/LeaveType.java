@@ -1,24 +1,64 @@
 package com.laps.backend.models;
-import jakarta.persistence.*;
-import jakarta.validation.constraints.Pattern;
-import lombok.AccessLevel;
-import lombok.Getter;
-import lombok.Setter;
 
-@Getter @Setter
+import java.io.Serializable;
+
+import jakarta.persistence.Column;
+import jakarta.persistence.Entity;
+import jakarta.persistence.Id;
+import jakarta.persistence.Table;
+import jakarta.validation.constraints.NotBlank;
+import jakarta.validation.constraints.NotNull;
+import jakarta.validation.constraints.Positive;
+import jakarta.persistence.EnumType;
+import jakarta.persistence.Enumerated;
+import jakarta.persistence.GeneratedValue;
+import jakarta.persistence.GenerationType;
+
 @Entity
-public class LeaveType {
-    @Id
-    @Setter(AccessLevel.NONE) // disable setter for id
-    @Getter(AccessLevel.NONE) // disable getter for id
-    @GeneratedValue(strategy = GenerationType.AUTO)
-    private Long id;
+@Table(name = "leaveType")
+	public class LeaveType{
+	
+	@Id
+	@GeneratedValue(strategy = GenerationType.IDENTITY)
+	private int Id;
 
-    // mandatory for name, maxDays. and name should be unique
-    @Column(nullable = false, unique = true)
-    private String name; // e.g., Annual, Medical, Compensation, etc.
-    @Column(nullable = false)
-    private int maxDays; // Max days allowed for this leave type
+	private String roleName;
+	
+    @Column(name = "name", columnDefinition = "ENUM('ANNUAL', 'MEDICAL', 'COMPENSATION')")
+    @Enumerated(EnumType.STRING)
+    private LeaveTypeEnum name;
+//    @Positive(message = "It must be a positive number")
+    private int entitledNum;
+    
+    public LeaveType() {}
 
-    // Standard getters and setters
+	public LeaveType(String roleName, LeaveTypeEnum name, int entitledNum) {
+		super();
+		this.roleName = roleName;
+		this.name = name;
+		this.entitledNum = entitledNum;
+	}
+
+
+
+	public int getId() {
+		return Id;
+	}
+
+	public LeaveTypeEnum getName() {
+		return name;
+	}
+
+	
+	public String getRoleName() {
+		return roleName;
+	}
+	
+	public int getEntitledNum() {
+		return entitledNum;
+	}
+    
+	public void setEntitledNum(Integer entitledNum) {
+		this.entitledNum = entitledNum;
+	}
 }
