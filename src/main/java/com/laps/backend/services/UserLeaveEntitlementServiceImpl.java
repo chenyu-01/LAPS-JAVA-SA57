@@ -1,9 +1,6 @@
 package com.laps.backend.services;
 
-import com.laps.backend.models.LeaveTypeEnum;
-import com.laps.backend.models.User;
 import com.laps.backend.models.UserLeaveEntitlement;
-import com.laps.backend.repositories.LeaveTypeRepository;
 import com.laps.backend.repositories.UserLeaveEntitlementRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -12,12 +9,10 @@ import org.springframework.stereotype.Service;
 public class UserLeaveEntitlementServiceImpl implements UserLeaveEntitlementService {
     private final UserLeaveEntitlementRepository userLeaveEntitlementRepository;
 
-    private final LeaveTypeRepository leaveTypeRepository;
 
     @Autowired
-    public UserLeaveEntitlementServiceImpl(UserLeaveEntitlementRepository userLeaveEntitlementRepository, LeaveTypeRepository leaveTypeRepository){
+    public UserLeaveEntitlementServiceImpl(UserLeaveEntitlementRepository userLeaveEntitlementRepository){
         this.userLeaveEntitlementRepository = userLeaveEntitlementRepository;
-        this.leaveTypeRepository = leaveTypeRepository;
     }
 
     @Override
@@ -26,9 +21,8 @@ public class UserLeaveEntitlementServiceImpl implements UserLeaveEntitlementServ
     }
 
     @Override
-    public void initUserLeaveEntitlement(User user) {
-
+    public void save(UserLeaveEntitlement newEntitlement) {
+        userLeaveEntitlementRepository.save(newEntitlement);
     }
-
 
 }

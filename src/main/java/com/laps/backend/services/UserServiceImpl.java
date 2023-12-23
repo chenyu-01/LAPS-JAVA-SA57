@@ -18,13 +18,13 @@ public class UserServiceImpl implements UserService {
 
     private final UserRepository repository;
 
-    private final UserLeaveEntitlementRepository userLeaveEntitlementRepository;
+    private final UserLeaveEntitlementServiceImpl userLeaveEntitlementRepository;
     private final ManagerRepository manager_repository;
 
     private final LeaveTypeRepository leaveTypeRepository;
 
     @Autowired
-    public UserServiceImpl(UserRepository repository, UserLeaveEntitlementRepository userLeaveEntitlementRepository, ManagerRepository manager_repository, LeaveTypeRepository leaveTypeRepository1) {
+    public UserServiceImpl(UserRepository repository, UserLeaveEntitlementServiceImpl userLeaveEntitlementRepository, ManagerRepository manager_repository, LeaveTypeRepository leaveTypeRepository1) {
         this.repository = repository;
         this.userLeaveEntitlementRepository = userLeaveEntitlementRepository;
         this.manager_repository = manager_repository;
@@ -38,14 +38,15 @@ public class UserServiceImpl implements UserService {
 
     @Override
     public void save(User user) {
-        String role = user.getRole();
+        String userRole = user.getRole();
         repository.save(user);
-        UserLeaveEntitlement userLeaveEntitlement = userLeaveEntitlementRepository.findByUserId(user.getId());
-        if (!role.equals("User") && userLeaveEntitlement == null) { // if user is not a normal user and user leave entitlement is not initialized
+        Long userId = user.getId();
+        UserLeaveEntitlement userLeaveEntitlement = userLeaveEntitlementRepository.findByUserId(userId);
+        if (!userRole.equals("User") && userLeaveEntitlement == null) { // if user is not a normal user and user leave entitlement is not initialized
             UserLeaveEntitlement newEntitlement = new UserLeaveEntitlement();
             newEntitlement.setUser(user);
             leaveTypeRepository.findAll().stream().filter(leaveType ->
-                            leaveType.getRoleName().equals(user.getRole()))
+                            leaveType.getRoleName().equals(userRole))
                     .forEach(leaveType -> {
                         int entitledDays = leaveType.getEntitledNum();
                         if(leaveType.getName().equals(LeaveTypeEnum.ANNUAL)){
@@ -57,6 +58,8 @@ public class UserServiceImpl implements UserService {
                         }
                     });
             userLeaveEntitlementRepository.save(newEntitlement);
+            user.setUserLeaveEntitlement(newEntitlement);
+            repository.save(user);
         }
     }
 
