@@ -49,20 +49,20 @@ public class LapsBackendApplication {
 			LeaveType lt9 = leaveTypeRepository.save(new LeaveType("Manager",LeaveTypeEnum.COMPENSATION, 10));
 
 			User user1 = new Manager();
-			user1.setEmail("testuser3@gmail.com");
+			user1.setEmail("manager@gmail.com");
 			user1.setPassword("password123");
 			user1.setName("Test User 3");
 			user1.setRole("Manager");
 			userRepository.save(user1); // persist manager to database first
 			User user2 = new Employee();
-			user2.setEmail("testuser@gmail.com");
+			user2.setEmail("employee1@gmail.com");
 			user2.setPassword("yYjHDp)d~+]Pb6");
 			user2.setName("Employee1");
 			user2.setRole("Employee");
 			((Employee) user2).setManager((Manager) user1);
 			userRepository.save(user2);
 			User user3 = new Employee();
-			user3.setEmail("testuser1@gmail.com");
+			user3.setEmail("employee2@gmail.com");
 			user3.setPassword("password123");
 			user3.setName("Employee2");
 			user3.setRole("Employee");
@@ -98,7 +98,7 @@ public class LapsBackendApplication {
 
 
 			User user4 = new Admin();
-			user4.setEmail("testuser2@gmail.com");
+			user4.setEmail("admin@gmail.com");
 			user4.setPassword("password123");
 			user4.setName("Test User 2");
 			user4.setRole("Admin");
