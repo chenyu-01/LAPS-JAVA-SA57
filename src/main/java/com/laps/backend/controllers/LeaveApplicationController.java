@@ -72,8 +72,8 @@ public class LeaveApplicationController {
             }
 
             List<LeaveApplicationDTO> applicationDTOS = new ArrayList<>();
-            //fliter the application status shall be "Applied"
-            applications.stream().filter(application -> application.getStatus().equals("Applied"))
+            //fliter the application status shall be "Applied" or "Updated"
+            applications.stream().filter(application -> application.getStatus().equals("Applied") || application.getStatus().equals("Updated"))
                     .forEach(application -> applicationDTOS.add(new LeaveApplicationDTO(application)));
 
             return ResponseEntity.ok(applicationDTOS);
