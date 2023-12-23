@@ -158,6 +158,7 @@ public class LeaveApplicationController {
 
     @PutMapping("/update")
     public ResponseEntity<?> updateEmployeeApplication(@RequestBody @Valid LeaveApplication leaveApplicationBody, BindingResult result) {
+        Map<String , Object> response = new HashMap<>();
         if (result.hasErrors()) {
             // Handle validation errors
             return new ResponseEntity<>(result.getAllErrors(), HttpStatus.BAD_REQUEST);
@@ -165,17 +166,20 @@ public class LeaveApplicationController {
         Long leaveId = leaveApplicationBody.getId();
         Optional<LeaveApplication> optleaveApplication = leaveApplicationService.findById(leaveId);
         if(!optleaveApplication.isPresent()) {
-            return new ResponseEntity<String>("Requested Leave Application Not Found",HttpStatus.NOT_FOUND);
+            response.put("message", "Requested Leave Application Not Found");
+            return new ResponseEntity<>(response, HttpStatus.NOT_FOUND);
         }
         LeaveApplication prevApplication = optleaveApplication.get();
         String status = prevApplication.getStatus();
         if (status.equals("Approved") || status.equals("Rejected") || status.equals("Cancelled")) {
-            return new ResponseEntity<String>("Cannot Update Application that is Approved, Rejected or Cancelled", HttpStatus.NOT_ACCEPTABLE);
+            response.put("message", "Cannot Update Application that is Approved, Rejected or Cancelled");
+            return new ResponseEntity<>(response, HttpStatus.NOT_ACCEPTABLE);
         }
         leaveApplicationBody.setStatus("Updated");
         leaveApplicationBody.setEmployee(prevApplication.getEmployee());
         leaveApplicationService.saveApplication(leaveApplicationBody);
-        return new ResponseEntity<String>("Successfully Update Application", HttpStatus.OK);
+        response.put("message", "Successfully Update Application");
+        return new ResponseEntity<>(response, HttpStatus.OK);
     }
 
     @PutMapping("/cancel/{id}")
@@ -213,18 +217,28 @@ public class LeaveApplicationController {
 
     @PostMapping("/submit/{id}")
     public ResponseEntity<?> submitEmployeeApplication(@PathVariable("id") Long inid,@RequestBody @Valid LeaveApplication leaveApplicationBody, BindingResult result) {
+        Map<String, Object> response = new HashMap<>();
         if (result.hasErrors()) {
             // Handle validation errors
-            return new ResponseEntity<>(result.getAllErrors(), HttpStatus.BAD_REQUEST);
+            response.put("message", "Invalid Leave Application");
+            response.put("errors", result.getAllErrors());
+            return new ResponseEntity<>(response, HttpStatus.BAD_REQUEST);
         }
         Optional<Employee> optEmployee = employeeService.findById(inid);
         if(!optEmployee.isPresent()){
-            return new ResponseEntity<String>("Employee Not Found",HttpStatus.NOT_FOUND);
+            response.put("message", "Employee Not Found");
+            return new ResponseEntity<>(response,HttpStatus.NOT_FOUND);
+        }
+        // if no manager, return BAD_REQUEST
+        if (optEmployee.get().getManager() == null) {
+            response.put("message", "This employee has no manager");
+            return new ResponseEntity<>(response, HttpStatus.BAD_REQUEST);
         }
         leaveApplicationBody.setStatus("Applied");
         leaveApplicationBody.setEmployee(optEmployee.get());
         leaveApplicationService.saveApplication(leaveApplicationBody);
-        return new ResponseEntity<String>("Successfully Submitted Application", HttpStatus.OK);
+        response.put("message", "Successfully Submitted Application");
+        return new ResponseEntity<>(response, HttpStatus.OK);
     }
 
     @PostMapping("/query/{id}")
