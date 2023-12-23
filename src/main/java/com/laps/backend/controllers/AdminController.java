@@ -167,4 +167,19 @@ private final AdminServiceImpl adminService;
         }
         return ResponseEntity.ok(userDTOS);
     }
+
+    @PostMapping("/user/Query")
+    public ResponseEntity<List<UserDTO>> getUsersByQuery(@RequestBody Map<String, String> Query) {
+        String[] Keywords = Query.get("query").split(" ");
+        List<User> users = adminService.searchUser(Keywords);
+        if (users.isEmpty()) {
+            return ResponseEntity.noContent().build(); // 204 No Content
+
+        }
+        List<UserDTO> userDTOS = new ArrayList<>();
+        for (User user : users) {
+            userDTOS.add(new UserDTO(user));
+        }
+        return ResponseEntity.ok(userDTOS);
+    }
 }

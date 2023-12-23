@@ -24,4 +24,6 @@ public interface AdminService {
     User createEmployee(User newUser);
 
     User createManager(User newUser);
+
+    List<User> searchUser(String[] keyword);
 }

@@ -5,6 +5,7 @@ import com.laps.backend.models.Employee;
 import com.laps.backend.models.LeaveApplication;
 import com.laps.backend.models.User;
 import com.laps.backend.repositories.LeaveApplicationRepository;
+import com.laps.backend.repositories.UserRepository;
 import com.laps.backend.specification.LeaveApplicationSpecification;
 import com.laps.backend.specification.UserSpecification;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -13,17 +14,22 @@ import org.springframework.stereotype.Service;
 import jakarta.annotation.Resource;
 
 import java.util.Arrays;
+import java.util.Collection;
 import java.util.List;
 import java.util.Optional;
+import java.util.stream.Stream;
 
 @Service
 public class LeaveApplicationServiceImpl implements LeaveApplicationService{
     @Autowired
     private final LeaveApplicationRepository leaveApplicationRepository;
+    private final UserRepository userRepository;
 
     @Autowired
-    public LeaveApplicationServiceImpl(LeaveApplicationRepository leaveApplicationRepository) {
+    public LeaveApplicationServiceImpl(LeaveApplicationRepository leaveApplicationRepository,
+                                       UserRepository userRepository) {
         this.leaveApplicationRepository = leaveApplicationRepository;
+        this.userRepository = userRepository;
     }
 
 
@@ -148,11 +154,27 @@ public class LeaveApplicationServiceImpl implements LeaveApplicationService{
 
     @Override
     public List<LeaveApplication> fuzzySearchApplication(String[] keywords) {
-        List<String> application_fields = Arrays.asList("startDate", "endDate", "type", "reason", "contactInfo");
+        List<String> application_fields = Arrays.asList("type", "reason", "contactInfo");
+        List<String> user_fields = Arrays.asList("name", "email", "role");
 
         Specification<LeaveApplication> application_spec = LeaveApplicationSpecification.byKeywords(application_fields, keywords);
+        Specification<User> user_spec = UserSpecification.byKeywords(user_fields, keywords);
 
-         return leaveApplicationRepository.findAll(application_spec);
+        List<LeaveApplication> applications = leaveApplicationRepository.findAll(application_spec);
+        List<LeaveApplication> userapplications = userRepository.findAll(user_spec).stream()
+                .filter(Employee.class::isInstance)
+                .map(Employee.class::cast)
+                .flatMap(employee -> Optional.ofNullable(employee.getLeaveApplications()).stream()
+                        .flatMap(Collection::stream)
+                    )
+                .distinct()
+                .toList();
+
+        applications = Stream.concat(applications.stream(), userapplications.stream())
+                .distinct()
+                .toList();
+
+        return applications;
     }
     // Methods for handling leave applications
 
