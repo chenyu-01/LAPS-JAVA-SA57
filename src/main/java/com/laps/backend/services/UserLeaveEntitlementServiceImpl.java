@@ -27,21 +27,7 @@ public class UserLeaveEntitlementServiceImpl implements UserLeaveEntitlementServ
 
     @Override
     public void initUserLeaveEntitlement(User user) {
-        UserLeaveEntitlement userLeaveEntitlement = user.getUserLeaveEntitlement();
-        userLeaveEntitlement.setUser(user);
-        leaveTypeRepository.findAll().stream().filter(leaveType ->
-                leaveType.getRoleName().equals(user.getRole()))
-                .forEach(leaveType -> {
-                    int entitledDays = leaveType.getEntitledNum();
-                    if(leaveType.getName().equals(LeaveTypeEnum.ANNUAL)){
-                        userLeaveEntitlement.setAnnualEntitledDays(entitledDays);
-                    } else if(leaveType.getName().equals(LeaveTypeEnum.MEDICAL)){
-                        userLeaveEntitlement.setMedicalEntitledDays(entitledDays);
-                    } else if(leaveType.getName().equals(LeaveTypeEnum.COMPENSATION)){
-                        userLeaveEntitlement.setCompensationEntitledDays(entitledDays);
-                    }
-                });
-        userLeaveEntitlementRepository.save(userLeaveEntitlement);
+
     }
 
 
