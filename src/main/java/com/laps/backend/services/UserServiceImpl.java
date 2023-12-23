@@ -1,6 +1,7 @@
 package com.laps.backend.services;
 
 import com.laps.backend.models.Employee;
+import com.laps.backend.models.LeaveType;
 import com.laps.backend.models.Manager;
 import com.laps.backend.models.User;
 import com.laps.backend.repositories.ManagerRepository;
@@ -16,11 +17,18 @@ import java.util.List;
 @Service
 public class UserServiceImpl implements UserService {
 
-    @Autowired
-    private UserRepository repository;
+    private final UserRepository repository;
+
+    private final LeaveTypeService leaveTypeService;
+
+    private final ManagerRepository manager_repository;
 
     @Autowired
-    private ManagerRepository manager_repository;
+    public UserServiceImpl(UserRepository repository, LeaveTypeService leaveTypeService, ManagerRepository manager_repository) {
+        this.repository = repository;
+        this.leaveTypeService = leaveTypeService;
+        this.manager_repository = manager_repository;
+    }
 
     @Override
     public User findByEmail(String username) {
