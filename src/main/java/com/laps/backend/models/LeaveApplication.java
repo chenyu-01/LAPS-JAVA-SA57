@@ -1,9 +1,5 @@
 package com.laps.backend.models;
 
-//import jakarta.persistence.Entity;
-//import jakarta.persistence.GeneratedValue;
-//import jakarta.persistence.GenerationType;
-//import jakarta.persistence.Id;
 
 import jakarta.persistence.*;
 import jakarta.validation.constraints.NotBlank;
@@ -27,6 +23,7 @@ public class LeaveApplication {
     @Column(nullable = false)
     private LocalDateTime endDate;
     @Column(nullable = false)
+     // Link to LeaveType.name
     private String type; // e.g., Annual, Medical, Compensation, etc.
     @Column(nullable = false)
     @Pattern(regexp = "Applied|Approved|Rejected|Deleted|Cancelled|Updated", message = "Status must be Applied, Approved, Rejected, Deleted, Cancelled, or Updated")
@@ -46,19 +43,6 @@ public class LeaveApplication {
 
     public LeaveApplication() {
 
-    }
-
-    public LeaveApplication(LeaveApplication other) {
-        this.setStartDate(other.getStartDate());
-        this.setEndDate(other.getEndDate());
-        this.setType(other.getType());
-        this.setStatus(other.getStatus());
-        this.setComment(other.getComment());
-        this.setReason(other.getReason());
-        this.setIsOverseas(other.getIsOverseas());
-        this.setContactInfo(other.getContactInfo());
-        this.setWorkDissemination(other.getWorkDissemination());
-        this.setEmployee(other.getEmployee());
     }
 
 }
