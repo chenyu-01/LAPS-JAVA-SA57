@@ -11,18 +11,25 @@ import com.laps.backend.services.EmployeeService;
 import com.laps.backend.services.LeaveApplicationService;
 import com.laps.backend.services.UserService;
 import com.laps.backend.services.LeaveApplicationServiceImpl;
+import com.laps.backend.validators.LeaveApplicationValidator;
+import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.validation.BindingResult;
+import org.springframework.web.bind.WebDataBinder;
 import org.springframework.web.bind.annotation.*;
 
 import java.text.SimpleDateFormat;
+import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 import java.text.DateFormat;
 import java.text.ParseException;
 import java.util.*;
+import java.util.stream.Collectors;
 
 @RestController
 @RequestMapping("/api/applications")
@@ -31,6 +38,16 @@ public class LeaveApplicationController {
     private  final UserService userService;
     private final LeaveApplicationService leaveApplicationService;
     private final EmployeeService employeeService;
+    private final DateTimeFormatter df = DateTimeFormatter.ofPattern("yyyy-MM-dd'T'HH:mm");
+
+    @Autowired
+    private LeaveApplicationValidator leaveApplicationValidator;
+
+    @InitBinder
+    protected void initBinder(WebDataBinder binder) {
+        binder.addValidators(leaveApplicationValidator);
+    }
+
 
     @Autowired
     public LeaveApplicationController(LeaveApplicationService leaveApplicationService, UserService userService, EmployeeService employeeService) {
@@ -38,7 +55,7 @@ public class LeaveApplicationController {
         this.employeeService = employeeService;
         this.userService = userService;
     }
-
+    // Get all leave applications
     @GetMapping("/applied")
     public ResponseEntity<List<LeaveApplicationDTO>> getAllAppliedApplications() {
         List<LeaveApplication> applications = leaveApplicationService.getAllAppliedApplications();
@@ -61,7 +78,6 @@ public class LeaveApplicationController {
 
             List<LeaveApplication> applications = new ArrayList<>();
             userService.findAllEmployeeByManager(manager)
-                    .stream()
                     .forEach(employee -> applications.addAll(leaveApplicationService.getAppliedApplicationsByEmployee(employee)));
 
             if (applications.isEmpty()) {
@@ -69,7 +85,10 @@ public class LeaveApplicationController {
             }
 
             List<LeaveApplicationDTO> applicationDTOS = new ArrayList<>();
-            applications.stream().forEach(application -> applicationDTOS.add(new LeaveApplicationDTO(application)));
+            //fliter the application status shall be "Applied" or "Updated"
+            applications.stream().filter(application -> application.getStatus().equals("Applied") || application.getStatus().equals("Updated"))
+                    .forEach(application -> applicationDTOS.add(new LeaveApplicationDTO(application)));
+
             return ResponseEntity.ok(applicationDTOS);
         }catch (Exception e) {
             return ResponseEntity.badRequest().body(null);
@@ -108,162 +127,141 @@ public class LeaveApplicationController {
         }
     }
 
-    @GetMapping("/approved/{id}")
-    public ResponseEntity<List<LeaveApplicationDTO>> getAllApprovedApplications(@PathVariable("id") Long id) {
-        Optional<Employee> optEmployee= employeeService.findById(id);
-        if(optEmployee.isPresent()){
-
+    @GetMapping("/get/{id}")
+    public ResponseEntity<LeaveApplicationDTO> getApplicationById(@PathVariable("id") Long id) {
+        Optional<LeaveApplication> application = leaveApplicationService.findById(id);
+        if (application == null) {
+            return ResponseEntity.notFound().build(); // 404
         }
-        List<LeaveApplication> applications = leaveApplicationService.getAllApprovedApplications();
-        if (applications.isEmpty()) {
-            return ResponseEntity.noContent().build();
-        }
-        List<LeaveApplicationDTO> applicationDTOS = new ArrayList<>();
-        applications.stream().forEach(application -> applicationDTOS.add(new LeaveApplicationDTO(application)));
-        return ResponseEntity.ok(applicationDTOS);
+        LeaveApplicationDTO applicationDTO = new LeaveApplicationDTO(application.get());
+        return ResponseEntity.ok(applicationDTO);
     }
 
-    @GetMapping("/find/{id}")
+    @GetMapping("/findemployee/{id}")
     public ResponseEntity<?> findEmployeeApplication(@PathVariable("id") Long id){
         Optional<Employee> optEmployee = employeeService.findById(id);
-        if (optEmployee.isPresent()){
-            Employee employee = optEmployee.get();
-            Optional<List<LeaveApplication>> optLeaveApplications = leaveApplicationService.getEmployeeAllApplications(employee);
-            if (optLeaveApplications.isPresent()){
-                List<LeaveApplication> leaveApplications = optLeaveApplications.get();
-                List<LeaveApplicationDTO>  leaveApplicationDTOS = new ArrayList<>();
-                leaveApplications.stream().forEach(application ->  leaveApplicationDTOS.add(new LeaveApplicationDTO(application)));
-                return new
-                        ResponseEntity<List<LeaveApplicationDTO>>(leaveApplicationDTOS,HttpStatus.OK);
-
-            }else {
-                return new
-                        ResponseEntity<List<LeaveApplicationDTO>>(HttpStatus.NOT_FOUND);
-            }
-        }else {
-            return new
-                    ResponseEntity<Employee>(HttpStatus.NOT_FOUND);
+        if (!optEmployee.isPresent()) {
+            return new ResponseEntity<String>("Employee Not Found",HttpStatus.NOT_FOUND);
         }
-
+        Employee employee = optEmployee.get();
+        Optional<List<LeaveApplication>> optLeaveApplications = leaveApplicationService.getEmployeeAllApplications(employee);
+        if (!optLeaveApplications.isPresent()){
+            return new ResponseEntity<String>("No Leave Application Found",HttpStatus.NOT_FOUND);
+        }
+        List<LeaveApplication> leaveApplications = optLeaveApplications.get();
+        List<LeaveApplicationDTO>  leaveApplicationDTOS = new ArrayList<>();
+        // filter out deleted applications
+        leaveApplications.stream().filter(application -> !application.getStatus().equals("Deleted")).
+                forEach(application ->  leaveApplicationDTOS.add(new LeaveApplicationDTO(application)));
+        return new ResponseEntity<List<LeaveApplicationDTO>>(leaveApplicationDTOS,HttpStatus.OK);
     }
 
-    @PutMapping("/update/{id}")
-    public ResponseEntity<?> updateEmployeeApplication(@PathVariable("id") Long inid,@RequestBody Map<String,String> leaveApplicationBody) throws ParseException {
-        Optional<Employee> optEmployee = employeeService.findById(inid);
-        SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss.SSS");
-        if(optEmployee.isPresent()){
-
-            Long id = Long.parseLong(leaveApplicationBody.get("id"));
-            Optional<LeaveApplication> optleaveApplication = leaveApplicationService.findById(id,inid);
-            if (optleaveApplication.isPresent()) {
-                LeaveApplication leaveApplication = optleaveApplication.get();
-                Date startDate = sdf.parse(leaveApplicationBody.get("startDate"));
-                Date endDate = sdf.parse(leaveApplicationBody.get("endDate"));
-                leaveApplication.setStartDate(startDate);
-                leaveApplication.setEndDate(endDate);
-                leaveApplication.setType(leaveApplicationBody.get("type"));
-                leaveApplication.setComment(leaveApplicationBody.get("comment"));
-                leaveApplication.setReason(leaveApplicationBody.get("reason"));
-                leaveApplicationService.saveApplication(leaveApplication);
-                LeaveApplicationDTO leaveApplicationDTO = new LeaveApplicationDTO(leaveApplication);
-                return new
-                        ResponseEntity<LeaveApplicationDTO>(leaveApplicationDTO, HttpStatus.OK);
-            }else{
-                return new
-                        ResponseEntity<LeaveApplicationDTO>(HttpStatus.NOT_FOUND);
-            }
-
-        }else {
-            return new
-                    ResponseEntity<Employee>(HttpStatus.NOT_FOUND);
+    @PutMapping("/update")
+    public ResponseEntity<?> updateEmployeeApplication(@RequestBody @Valid LeaveApplication leaveApplicationBody, BindingResult result) {
+        Map<String , Object> response = new HashMap<>();
+        if (result.hasErrors()) {
+            // Handle validation errors
+            return new ResponseEntity<>(result.getAllErrors(), HttpStatus.BAD_REQUEST);
         }
-
-
+        Long leaveId = leaveApplicationBody.getId();
+        Optional<LeaveApplication> optleaveApplication = leaveApplicationService.findById(leaveId);
+        if(!optleaveApplication.isPresent()) {
+            response.put("message", "Requested Leave Application Not Found");
+            return new ResponseEntity<>(response, HttpStatus.NOT_FOUND);
+        }
+        LeaveApplication prevApplication = optleaveApplication.get();
+        String status = prevApplication.getStatus();
+        if (status.equals("Approved") || status.equals("Rejected") || status.equals("Cancelled")) {
+            response.put("message", "Cannot Update Application that is Approved, Rejected or Cancelled");
+            return new ResponseEntity<>(response, HttpStatus.NOT_ACCEPTABLE);
+        }
+        leaveApplicationBody.setStatus("Updated");
+        leaveApplicationBody.setEmployee(prevApplication.getEmployee());
+        leaveApplicationService.saveApplication(leaveApplicationBody);
+        response.put("message", "Successfully Update Application");
+        return new ResponseEntity<>(response, HttpStatus.OK);
     }
 
     @PutMapping("/cancel/{id}")
-    public ResponseEntity<?> cancelEmployeeApplication(@PathVariable("id") Long inid,@RequestBody Map<String,String> leaveApplicationBody) throws ParseException {
-
-        Optional<Employee> optEmployee = employeeService.findById(inid);
-        if(optEmployee.isPresent()){
-
-            Long id = Long.parseLong(leaveApplicationBody.get("id"));
-            Optional<LeaveApplication> optleaveApplication = leaveApplicationService.findById(id,inid);
+    public ResponseEntity<?> cancelEmployeeApplication(@PathVariable("id") Long leaveId) {
+            Optional<LeaveApplication> optleaveApplication = leaveApplicationService.findById(leaveId);
             if (optleaveApplication.isPresent()) {
                 LeaveApplication leaveApplication = optleaveApplication.get();
+                if (!leaveApplication.getStatus().equals("Approved")) {
+                    return new ResponseEntity<LeaveApplicationDTO>(HttpStatus.NOT_ACCEPTABLE);
+                }
                 leaveApplication.setStatus("Cancelled");
                 leaveApplicationService.saveApplication(leaveApplication);
-                LeaveApplicationDTO leaveApplicationDTO = new LeaveApplicationDTO(leaveApplication);
-                return new
-                        ResponseEntity<LeaveApplicationDTO>(leaveApplicationDTO, HttpStatus.OK);
-            }else{
-                return new
-                        ResponseEntity<LeaveApplicationDTO>(HttpStatus.NOT_FOUND);
+                return new  ResponseEntity<String>("Cancelled Application", HttpStatus.OK);
             }
-
-        }else {
-            return new
-                    ResponseEntity<Employee>(HttpStatus.NOT_FOUND);
-        }
-
-
+            return new ResponseEntity<String>("Application Not Found" ,HttpStatus.NOT_FOUND);
     }
 
 
-    @PutMapping("/delete/{id}")
-    public ResponseEntity<?> deleteEmployeeApplication(@PathVariable("id") Long inid,@RequestBody Map<String,String> leaveApplicationBody) throws ParseException {
-        Optional<Employee> optEmployee = employeeService.findById(inid);
-        if(optEmployee.isPresent()){
-
-            Long id = Long.parseLong(leaveApplicationBody.get("id"));
-            Optional<LeaveApplication> optleaveApplication = leaveApplicationService.findById(id,inid);
-            if (optleaveApplication.isPresent()) {
-                LeaveApplication leaveApplication = optleaveApplication.get();
-                leaveApplication.setStatus("Deleted");
-                leaveApplicationService.saveApplication(leaveApplication);
-                LeaveApplicationDTO leaveApplicationDTO = new LeaveApplicationDTO(leaveApplication);
-                return new
-                        ResponseEntity<LeaveApplicationDTO>(leaveApplicationDTO, HttpStatus.OK);
-            }else{
-                return new
-                        ResponseEntity<LeaveApplicationDTO>(HttpStatus.NOT_FOUND);
+    @DeleteMapping("/delete/{id}")
+        public ResponseEntity<String> deleteEmployeeApplication(@PathVariable("id") Long leaveId) {
+            Optional<LeaveApplication> optleaveApplication = leaveApplicationService.findById(leaveId);
+            if (!optleaveApplication.isPresent()) {
+                return new ResponseEntity<String>("Application Not Found", HttpStatus.NOT_FOUND);
             }
-
-        }else {
-            return new
-                    ResponseEntity<Employee>(HttpStatus.NOT_FOUND);
-        }
-
-
-    }
-
-    @PutMapping("submit/{id}")
-    public ResponseEntity<?> submitEmployeeApplication(@PathVariable("id") Long inid,@RequestBody Map<String,String> leaveApplicationBody) throws ParseException {
-        Optional<Employee> optEmployee = employeeService.findById(inid);
-        SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss.SSS");
-        if(optEmployee.isPresent()){
-            LeaveApplication leaveApplication = new LeaveApplication();
-            Date startDate = sdf.parse(leaveApplicationBody.get("startDate"));
-            Date endDate = sdf.parse(leaveApplicationBody.get("endDate"));
-            leaveApplication.setStartDate(startDate);
-            leaveApplication.setEndDate(endDate);
-            leaveApplication.setType(leaveApplicationBody.get("type"));
-            leaveApplication.setComment(leaveApplicationBody.get("comment"));
-            leaveApplication.setReason(leaveApplicationBody.get("reason"));
-            leaveApplication.setStatus("Applied");
-            leaveApplication.setContactInfo(leaveApplicationBody.get("contactInfo"));
-            leaveApplication.setEmployee(optEmployee.get());
+            String status = optleaveApplication.get().getStatus();
+            if (status.equals(("Approved")) || status.equals("Rejected")) {
+                return new ResponseEntity<String>("Cannot Delete Application that is Approved Or Rejected", HttpStatus.NOT_ACCEPTABLE);
+            }
+            LeaveApplication leaveApplication = optleaveApplication.get();
+            leaveApplication.setStatus("Deleted");
             leaveApplicationService.saveApplication(leaveApplication);
-            LeaveApplicationDTO leaveApplicationDTO = new LeaveApplicationDTO(leaveApplication);
-            return new
-                    ResponseEntity<LeaveApplicationDTO>(leaveApplicationDTO, HttpStatus.OK);
-        } else {
-            return new
-                    ResponseEntity<Employee>(HttpStatus.NOT_FOUND);
-        }
-
+            return new ResponseEntity<String>("Application Successfully Deleted", HttpStatus.OK);
 
     }
+
+    @PostMapping("/submit/{id}")
+    public ResponseEntity<?> submitEmployeeApplication(@PathVariable("id") Long inid,@RequestBody @Valid LeaveApplication leaveApplicationBody, BindingResult result) {
+        Map<String, Object> response = new HashMap<>();
+        if (result.hasErrors()) {
+            // Handle validation errors
+            response.put("message", "Invalid Leave Application");
+            response.put("errors", result.getAllErrors());
+            return new ResponseEntity<>(response, HttpStatus.BAD_REQUEST);
+        }
+        Optional<Employee> optEmployee = employeeService.findById(inid);
+        if(!optEmployee.isPresent()){
+            response.put("message", "Employee Not Found");
+            return new ResponseEntity<>(response,HttpStatus.NOT_FOUND);
+        }
+        // if no manager, return BAD_REQUEST
+        if (optEmployee.get().getManager() == null) {
+            response.put("message", "This employee has no manager");
+            return new ResponseEntity<>(response, HttpStatus.BAD_REQUEST);
+        }
+        leaveApplicationBody.setStatus("Applied");
+        leaveApplicationBody.setEmployee(optEmployee.get());
+        leaveApplicationService.saveApplication(leaveApplicationBody);
+        response.put("message", "Successfully Submitted Application");
+        return new ResponseEntity<>(response, HttpStatus.OK);
+    }
+
+    @PostMapping("/query/{id}")
+    public ResponseEntity<List<LeaveApplicationDTO>> queryEmployeeApplication(@PathVariable("id") Long id,@RequestBody String query) throws ParseException {
+       Optional<Manager> optManager = Optional.ofNullable(userService.findManagerById(id));
+         if (optManager.isEmpty()) {
+          return ResponseEntity.noContent().build(); // 204 No Content
+         }
+        Manager manager = optManager.get();
+
+        String[] keywords = query.split(" ");
+
+        List<LeaveApplication> results = leaveApplicationService.fuzzySearchApplication(keywords).stream()
+                .filter(leaveApplication -> leaveApplication.getEmployee().getManager().equals(manager))
+                .toList();
+
+
+        if (results.isEmpty()) {
+            return ResponseEntity.noContent().build(); // 204 No Content
+        }
+        return ResponseEntity.ok(results.stream().map(LeaveApplicationDTO::new).collect(Collectors.toList()));
+    }
+
 
 }
 

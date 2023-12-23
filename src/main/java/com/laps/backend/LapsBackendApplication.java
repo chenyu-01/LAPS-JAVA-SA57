@@ -13,6 +13,7 @@ import com.laps.backend.repositories.LeaveTypeRepository;
 import com.laps.backend.repositories.PublicHolidayRepository;
 
 import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.util.Date;
 import java.util.List;
 
@@ -48,20 +49,20 @@ public class LapsBackendApplication {
 			LeaveType lt9 = leaveTypeRepository.save(new LeaveType("Manager",LeaveTypeEnum.COMPENSATION, 10));
 
 			User user1 = new Manager();
-			user1.setEmail("testuser3@gmail.com");
+			user1.setEmail("manager@gmail.com");
 			user1.setPassword("password123");
 			user1.setName("Test User 3");
 			user1.setRole("Manager");
 			userRepository.save(user1); // persist manager to database first
 			User user2 = new Employee();
-			user2.setEmail("testuser@gmail.com");
+			user2.setEmail("employee1@gmail.com");
 			user2.setPassword("yYjHDp)d~+]Pb6");
 			user2.setName("Employee1");
 			user2.setRole("Employee");
 			((Employee) user2).setManager((Manager) user1);
 			userRepository.save(user2);
 			User user3 = new Employee();
-			user3.setEmail("testuser1@gmail.com");
+			user3.setEmail("employee2@gmail.com");
 			user3.setPassword("password123");
 			user3.setName("Employee2");
 			user3.setRole("Employee");
@@ -71,20 +72,33 @@ public class LapsBackendApplication {
 			List<Employee> employees = List.of((Employee) user2, (Employee) user3);
 			((Manager) user1).setSubordinates(employees);
 			userRepository.save(user1);
-			for (int i = 0; i < 10; i++){
+			for (int i = 0; i < 5; i++){
 				LeaveApplication leaveApplication1 = new LeaveApplication();
 				leaveApplication1.setEmployee((Employee) user2);
-				leaveApplication1.setStartDate(Date.from(new Date().toInstant().plusSeconds(86400))); // tomorrow
-				leaveApplication1.setEndDate(Date.from(new Date().toInstant().plusSeconds(86400 * 2))); // day after tomorrow
+				leaveApplication1.setStartDate(LocalDateTime.now()); // today
+				leaveApplication1.setEndDate(LocalDateTime.now().plusDays(1)); // tomorrow
 				leaveApplication1.setReason("Sick");
 				leaveApplication1.setStatus("Applied");
 				leaveApplication1.setType("Annual");
+				leaveApplication1.setIsOverseas(false);
 				leaveRepository.save(leaveApplication1);
+			}
+
+			for (int i = 0 ; i < 5; i++){
+				LeaveApplication leaveApplication2 = new LeaveApplication();
+				leaveApplication2.setEmployee((Employee) user3);
+				leaveApplication2.setStartDate(LocalDateTime.now().plusDays(1)); // tomorrow
+				leaveApplication2.setEndDate(LocalDateTime.now().plusDays(2)); // day after tomorrow
+				leaveApplication2.setReason("Sick");
+				leaveApplication2.setStatus("Approved");
+				leaveApplication2.setType("Annual");
+				leaveApplication2.setIsOverseas(false);
+				leaveRepository.save(leaveApplication2);
 			}
 
 
 			User user4 = new Admin();
-			user4.setEmail("testuser2@gmail.com");
+			user4.setEmail("admin@gmail.com");
 			user4.setPassword("password123");
 			user4.setName("Test User 2");
 			user4.setRole("Admin");

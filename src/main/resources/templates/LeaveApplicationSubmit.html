@@ -4,7 +4,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Leave Application Form</title>
-    <link th:href="@{css/styles.css}" rel="stylesheet" type="text/css" />
+    <link th:href="@{/css/styles.css}" rel="stylesheet" type="text/css" />
 </head>
 <body class="bg-gray-100">
     <div class="container mx-auto p-8">
@@ -18,7 +18,7 @@
                             <span class="text-sm font-bold">User</span>
                         </div>
                     </div>
-                    <img th:src="@{img/application.png}" alt="drawing" class="my-4 hidden md:block">
+                    <img th:src="@{/img/application.png}" alt="drawing" class="my-4 hidden md:block">
                     <div class="flex items-center justify-center my-5 w-full">
                         <div class="bg-red-300 hover:bg-red-500 text-white text-center font-bold py-2 px-4 rounded focus:outline-none focus:shadow-outline w-full">
                             <a href="/dashboard">go back to dashboard</a>
@@ -29,8 +29,8 @@
                 <div class="w-full p-4">
                     <div class="relative">
                         <div class="text-lg text-gray-700 font-semibold">Leave Application Form</div>
-                        <form class="mt-4">
-                            <div class="mb-4">
+                        <form class="mt-4" id="applicationForm" th:action="@{/api/applications/submit/{id}(id=${id})}" method="post" onsubmit="return submitForm(event);">
+                        <div class="mb-4">
                                 <label class="block text-gray-700 text-sm font-bold mb-2" for="leaveType">
                                     Select Leave Type
                                 </label>
@@ -44,13 +44,13 @@
                                 <label class="block text-gray-700 text-sm font-bold mb-2" for="startDate">
                                     Start Date
                                 </label>
-                                <input type="date" id="startDate" class="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline">
+                                <input type="datetime-local" id="startDate" class="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline">
                             </div>
                             <div class="mb-4">
                                 <label class="block text-gray-700 text-sm font-bold mb-2" for="endDate">
                                     End Date
                                 </label>
-                                <input type="date" id="endDate" class="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline">
+                                <input type="datetime-local" id="endDate" class="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline">
                             </div>
                             <div class="mb-4">
                                 <label class="block text-gray-700 text-sm font-bold mb-2" for="reason">
@@ -64,11 +64,27 @@
                                 </label>
                                 <input type="text" id="contactInfo" class="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline" placeholder="Phone number or email">
                             </div>
+                            <div class="mb-4">
+                                <label class="block text-gray-700 text-sm font-bold mb-2" for="isOverseas">
+                                    Are you applying for Overseas Leave?
+                                </label>
+                                <select id="isOverseas" class="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline">
+                                    <option value="false">No</option>
+                                    <option value="true">Yes</option>
+                                </select>
+                            </div>
+                            <div class="mb-4">
+                                <label class="block text-gray-700 text-sm font-bold mb-2" for="isOverseas">
+                                    Work Dissemination (if applicable)
+                                </label>
+                                <input type="text" id="workDissemination" class="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline" placeholder="Work assembly info">
+                            </div>
                             <div class="flex items-center justify-center">
                                 <button class="bg-indigo-400 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded focus:outline-none focus:shadow-outline w-full" type="submit">
                                     Submit Application
                                 </button>
                             </div>
+
                         </form>
                     </div>
                 </div>
@@ -76,4 +92,70 @@
         </div>
     </div>
 </body>
+
+<script >
+
+    function submitForm(event){
+        event.preventDefault();
+        const form = document.getElementById("applicationForm");
+        const actionUrl = form.getAttribute("action");
+        console.log(actionUrl);
+        //const id = 2;
+        const json_leaveType = document.getElementById("leaveType").value ;
+        const json_startDate = document.getElementById("startDate").value;
+        const json_endDate = document.getElementById("endDate").value;
+        const json_reason = document.getElementById("reason").value;
+        const json_contactInfo = document.getElementById("contactInfo").value;
+        const json_isOverseas = document.getElementById("isOverseas").value;
+        const json_workDissemination = document.getElementById("workDissemination").value;
+        const xhr = new XMLHttpRequest();
+        const data = {
+            type: json_leaveType,
+            startDate: json_startDate,
+            endDate: json_endDate,
+            reason: json_reason,
+            contactInfo : json_contactInfo,
+            isOverseas: json_isOverseas,
+            workDissemination: json_workDissemination
+        }
+        const jsonData = JSON.stringify(data);
+
+        xhr.open('post',actionUrl,true);
+        xhr.setRequestHeader('Content-Type','application/json');
+        xhr.onreadystatechange = function(){
+            if(xhr.readyState === 4 ){
+                if(xhr.status === 200){
+                    alert(xhr.responseText);
+                    window.location.href = "/dashboard";
+                }
+                else {
+                    handleErrorResponse(xhr.responseText)
+                }
+            }
+        }
+        xhr.send(jsonData);
+
+        return false;
+    }
+
+    function handleErrorResponse(responseText) {
+        try {
+            const responseObj = JSON.parse(responseText);
+            let errorMessage = '';
+            if (Array.isArray(responseObj)) {
+                responseObj.forEach((error) => {
+                    errorMessage += error.defaultMessage + '\n'; // Add each error message to the alert
+                });
+            } else {
+                // If the error structure is different, adjust accordingly
+                errorMessage = responseObj.message || 'An error occurred';
+            }
+            alert(errorMessage);
+        } catch (e) {
+            alert('An error occurred while processing the response.');
+        }
+    }
+
+</script>
 </html>
+

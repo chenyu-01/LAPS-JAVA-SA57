@@ -19,5 +19,4 @@ public interface UserService {
     //find manager by id
     Manager findManagerById(long id);
 
-    List<User> searchUser(String[] keyword);
 }
