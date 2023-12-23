@@ -7,7 +7,9 @@ import com.laps.backend.models.User;
 import com.laps.backend.repositories.EmployeeReposity;
 import com.laps.backend.repositories.ManagerRepository;
 import com.laps.backend.repositories.UserRepository;
+import com.laps.backend.specification.UserSpecification;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.jpa.domain.Specification;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 
@@ -36,10 +38,10 @@ public class AdminServiceImpl implements AdminService {
 
     @Override
     public User editUser(User user) {
-       if (user.getId() != null && userRepository.existsById(user.getId())) {
+        if (user.getId() != null && userRepository.existsById(user.getId())) {
             return userRepository.save(user);
         }
-       throw new IllegalArgumentException("User not found with id: " + user.getId());
+        throw new IllegalArgumentException("User not found with id: " + user.getId());
     }
 
     @Override
@@ -97,6 +99,7 @@ public class AdminServiceImpl implements AdminService {
         }
         return userRepository.save(newUser);
     }
+
     @Override
     public User createAdmin(User newUser) {
         if (userRepository.existsByEmail(newUser.getEmail())) {
@@ -109,7 +112,8 @@ public class AdminServiceImpl implements AdminService {
     public Manager getManagerByName(String managerName) {
         return managerRepository.findByName(managerName);
     }
-@Override
+
+    @Override
     public User createEmployee(User newUser, Manager manager) {
         if (userRepository.existsByEmail(newUser.getEmail())) {
             throw new IllegalArgumentException("User with email " + newUser.getEmail() + " already exists");
@@ -141,7 +145,7 @@ public class AdminServiceImpl implements AdminService {
         Optional<Employee> employee = employeeRepository.findById(id);
         if (employee.isPresent()) {
             return employee.get().getManager();
-        }else
+        } else
             throw new IllegalArgumentException("Employee not found with id: " + id);
 
     }
@@ -150,5 +154,13 @@ public class AdminServiceImpl implements AdminService {
         if (user instanceof Employee)
             return employeeRepository.save((Employee) user);
         else return userRepository.save(user);
+    }
+
+    @Override
+    public List<User> searchUser(String[] keyword) {
+        List<String> user_fields = Arrays.asList("name", "email", "role");
+        Specification<User> spec = UserSpecification.byKeywords(user_fields, keyword);
+
+        return userRepository.findAll(spec);
     }
 }

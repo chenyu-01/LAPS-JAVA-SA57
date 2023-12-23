@@ -29,6 +29,7 @@ import java.util.Map;
 import java.text.DateFormat;
 import java.text.ParseException;
 import java.util.*;
+import java.util.stream.Collectors;
 
 @RestController
 @RequestMapping("/api/applications")
@@ -77,7 +78,6 @@ public class LeaveApplicationController {
 
             List<LeaveApplication> applications = new ArrayList<>();
             userService.findAllEmployeeByManager(manager)
-                    .stream()
                     .forEach(employee -> applications.addAll(leaveApplicationService.getAppliedApplicationsByEmployee(employee)));
 
             if (applications.isEmpty()) {
@@ -85,7 +85,10 @@ public class LeaveApplicationController {
             }
 
             List<LeaveApplicationDTO> applicationDTOS = new ArrayList<>();
-            applications.stream().forEach(application -> applicationDTOS.add(new LeaveApplicationDTO(application)));
+            //fliter the application status shall be "Applied"
+            applications.stream().filter(application -> application.getStatus().equals("Applied"))
+                    .forEach(application -> applicationDTOS.add(new LeaveApplicationDTO(application)));
+
             return ResponseEntity.ok(applicationDTOS);
         }catch (Exception e) {
             return ResponseEntity.badRequest().body(null);
@@ -224,7 +227,26 @@ public class LeaveApplicationController {
         return new ResponseEntity<String>("Successfully Submitted Application", HttpStatus.OK);
     }
 
+    @PostMapping("/query/{id}")
+    public ResponseEntity<List<LeaveApplicationDTO>> queryEmployeeApplication(@PathVariable("id") Long id,@RequestBody String query) throws ParseException {
+       Optional<Manager> optManager = Optional.ofNullable(userService.findManagerById(id));
+         if (optManager.isEmpty()) {
+          return ResponseEntity.noContent().build(); // 204 No Content
+         }
+        Manager manager = optManager.get();
 
+        String[] keywords = query.split(" ");
+
+        List<LeaveApplication> results = leaveApplicationService.fuzzySearchApplication(keywords).stream()
+                .filter(leaveApplication -> leaveApplication.getEmployee().getManager().equals(manager))
+                .toList();
+
+
+        if (results.isEmpty()) {
+            return ResponseEntity.noContent().build(); // 204 No Content
+        }
+        return ResponseEntity.ok(results.stream().map(LeaveApplicationDTO::new).collect(Collectors.toList()));
+    }
 
 
 }
