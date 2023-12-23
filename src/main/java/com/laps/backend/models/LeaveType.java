@@ -15,9 +15,10 @@ import jakarta.persistence.EnumType;
 import jakarta.persistence.Enumerated;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
+
+@Entity
 @Getter
 @Setter
-@Entity
 @Table(name = "leaveType")
 	public class LeaveType{
 	
