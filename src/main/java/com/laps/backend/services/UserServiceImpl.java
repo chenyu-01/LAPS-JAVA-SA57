@@ -43,12 +43,4 @@ public class UserServiceImpl implements UserService {
     public Manager findManagerById(long id) {
         return manager_repository.findById(id);
     }
-
-    @Override
-    public List<User> searchUser(String[] keyword) {
-        List<String> user_fields = Arrays.asList("name", "email", "role");
-        Specification<User> spec = UserSpecification.byKeywords(user_fields, keyword);
-
-        return repository.findAll(spec);
-    }
 }
