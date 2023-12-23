@@ -154,36 +154,29 @@ public class LeaveApplicationController {
     }
 
     @PutMapping("/update")
-    public ResponseEntity<?> updateEmployeeApplication(@RequestBody Map<String,String> leaveApplicationBody) throws ParseException {
-        Long leaveId = Long.parseLong(leaveApplicationBody.get("leaveId"));
+    public ResponseEntity<?> updateEmployeeApplication(@RequestBody @Valid LeaveApplication leaveApplicationBody, BindingResult result) {
+        if (result.hasErrors()) {
+            // Handle validation errors
+            return new ResponseEntity<>(result.getAllErrors(), HttpStatus.BAD_REQUEST);
+        }
+        Long leaveId = leaveApplicationBody.getId();
         Optional<LeaveApplication> optleaveApplication = leaveApplicationService.findById(leaveId);
         if(!optleaveApplication.isPresent()) {
             return new ResponseEntity<String>("Requested Leave Application Not Found",HttpStatus.NOT_FOUND);
         }
-        String status = optleaveApplication.get().getStatus();
+        LeaveApplication prevApplication = optleaveApplication.get();
+        String status = prevApplication.getStatus();
         if (status.equals("Approved") || status.equals("Rejected") || status.equals("Cancelled")) {
             return new ResponseEntity<String>("Cannot Update Application that is Approved, Rejected or Cancelled", HttpStatus.NOT_ACCEPTABLE);
         }
-        LeaveApplication leaveApplication = optleaveApplication.get();
-        LocalDateTime startDate = LocalDateTime.parse(leaveApplicationBody.get("startDate"),df);
-        LocalDateTime endDate = LocalDateTime.parse(leaveApplicationBody.get("endDate"),df);
-        leaveApplication.setStartDate(startDate); //1
-        leaveApplication.setEndDate(endDate); //2
-        leaveApplication.setType(leaveApplicationBody.get("type")); //3
-        leaveApplication.setReason(leaveApplicationBody.get("reason")); //4
-        if(leaveApplicationBody.get("contactInfo") == null && leaveApplicationBody.get("isOverseas").equals("true")) {
-            return new ResponseEntity<String>("Contact Information is Required for Overseas Leave", HttpStatus.NOT_ACCEPTABLE);
-        }
-        leaveApplication.setContactInfo(leaveApplicationBody.get("contactInfo")); //5
-        leaveApplication.setStatus("Updated"); //6
-        leaveApplication.setIsOverseas(Boolean.parseBoolean(leaveApplicationBody.get("isOverseas"))); //7
-        // no need to update employee and comment
-        leaveApplicationService.saveApplication(leaveApplication);
+        leaveApplicationBody.setStatus("Updated");
+        leaveApplicationBody.setEmployee(prevApplication.getEmployee());
+        leaveApplicationService.saveApplication(leaveApplicationBody);
         return new ResponseEntity<String>("Successfully Update Application", HttpStatus.OK);
     }
 
     @PutMapping("/cancel/{id}")
-    public ResponseEntity<?> cancelEmployeeApplication(@PathVariable("id") Long leaveId) throws ParseException {
+    public ResponseEntity<?> cancelEmployeeApplication(@PathVariable("id") Long leaveId) {
             Optional<LeaveApplication> optleaveApplication = leaveApplicationService.findById(leaveId);
             if (optleaveApplication.isPresent()) {
                 LeaveApplication leaveApplication = optleaveApplication.get();
