@@ -22,7 +22,7 @@ public class LeaveApplicationDTO implements Serializable {
     private String reason;
     private String contactInfo;
     private String employeeId;
-    private static final DateTimeFormatter df = DateTimeFormatter.ofPattern("yyyy-MM-dd'T'HH:mm");
+    private static final DateTimeFormatter df = DateTimeFormatter.ofPattern("yyyy-MM-dd");
     public LeaveApplicationDTO(LeaveApplication other) {
         this.id = other.getId().toString();
         this.startDate = df.format(other.getStartDate());

@@ -1,6 +1,5 @@
 package com.laps.backend.models;
 
-import com.laps.backend.controllers.AdminController;
 import jakarta.persistence.*;
 import lombok.Getter;
 import lombok.Setter;

@@ -1,9 +1,9 @@
 package com.laps.backend.services;
 
-import com.laps.backend.models.Employee;
-import com.laps.backend.models.Manager;
-import com.laps.backend.models.User;
+import com.laps.backend.models.*;
+import com.laps.backend.repositories.LeaveTypeRepository;
 import com.laps.backend.repositories.ManagerRepository;
+import com.laps.backend.repositories.UserLeaveEntitlementRepository;
 import com.laps.backend.repositories.UserRepository;
 import com.laps.backend.specification.UserSpecification;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -16,11 +16,20 @@ import java.util.List;
 @Service
 public class UserServiceImpl implements UserService {
 
-    @Autowired
-    private UserRepository repository;
+    private final UserRepository repository;
+
+    private final UserLeaveEntitlementServiceImpl userLeaveEntitlementRepository;
+    private final ManagerRepository manager_repository;
+
+    private final LeaveTypeRepository leaveTypeRepository;
 
     @Autowired
-    private ManagerRepository manager_repository;
+    public UserServiceImpl(UserRepository repository, UserLeaveEntitlementServiceImpl userLeaveEntitlementRepository, ManagerRepository manager_repository, LeaveTypeRepository leaveTypeRepository1) {
+        this.repository = repository;
+        this.userLeaveEntitlementRepository = userLeaveEntitlementRepository;
+        this.manager_repository = manager_repository;
+        this.leaveTypeRepository = leaveTypeRepository1;
+    }
 
     @Override
     public User findByEmail(String username) {
@@ -29,13 +38,34 @@ public class UserServiceImpl implements UserService {
 
     @Override
     public void save(User user) {
+        String userRole = user.getRole();
         repository.save(user);
+        Long userId = user.getId();
+        UserLeaveEntitlement userLeaveEntitlement = userLeaveEntitlementRepository.findByUserId(userId);
+        if (!userRole.equals("User") && userLeaveEntitlement == null) { // if user is not a normal user and user leave entitlement is not initialized
+            UserLeaveEntitlement newEntitlement = new UserLeaveEntitlement();
+            newEntitlement.setUser(user);
+            leaveTypeRepository.findAll().stream().filter(leaveType ->
+                            leaveType.getRoleName().equals(userRole))
+                    .forEach(leaveType -> {
+                        int entitledDays = leaveType.getEntitledNum();
+                        if(leaveType.getName().equals(LeaveTypeEnum.ANNUAL)){
+                            newEntitlement.setAnnualEntitledDays(entitledDays);
+                        } else if(leaveType.getName().equals(LeaveTypeEnum.MEDICAL)){
+                            newEntitlement.setMedicalEntitledDays(entitledDays);
+                        } else if(leaveType.getName().equals(LeaveTypeEnum.COMPENSATION)){
+                            newEntitlement.setCompensationEntitledDays(entitledDays);
+                        }
+                    });
+            userLeaveEntitlementRepository.save(newEntitlement);
+            user.setUserLeaveEntitlement(newEntitlement);
+            repository.save(user);
+        }
     }
 
     @Override
     public List<Employee> findAllEmployeeByManager(Manager manager) {
         return manager.getSubordinates();
-
     }
 
 

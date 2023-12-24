@@ -2,6 +2,7 @@ package com.laps.backend;
 
 import com.laps.backend.models.*;
 import com.laps.backend.repositories.*;
+import com.laps.backend.services.UserServiceImpl;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.boot.autoconfigure.security.servlet.SecurityAutoConfiguration;
@@ -25,8 +26,8 @@ public class LapsBackendApplication {
 	}
 
 	@Bean
-	CommandLineRunner initDatabase(UserRepository userRepository, RoleRepository rolerepository,
-			LeaveTypeRepository leaveTypeRepository, LeaveApplicationRepository leaveRepository,PublicHolidayRepository publicHolidayRepository) {
+	CommandLineRunner initDatabase(UserServiceImpl userService, RoleRepository rolerepository,
+								   LeaveTypeRepository leaveTypeRepository, LeaveApplicationRepository leaveRepository, PublicHolidayRepository publicHolidayRepository) {
 
 		return args -> {
 
@@ -53,30 +54,30 @@ public class LapsBackendApplication {
 			user1.setPassword("password123");
 			user1.setName("Test User 3");
 			user1.setRole("Manager");
-			userRepository.save(user1); // persist manager to database first
+			userService.save(user1); // persist manager to database first
 			User user2 = new Employee();
 			user2.setEmail("employee1@gmail.com");
 			user2.setPassword("yYjHDp)d~+]Pb6");
 			user2.setName("Employee1");
 			user2.setRole("Employee");
 			((Employee) user2).setManager((Manager) user1);
-			userRepository.save(user2);
+			userService.save(user2);
 			User user3 = new Employee();
 			user3.setEmail("employee2@gmail.com");
 			user3.setPassword("password123");
 			user3.setName("Employee2");
 			user3.setRole("Employee");
 			((Employee) user3).setManager((Manager) user1);
-			userRepository.save(user3);
+			userService.save(user3);
 
 			List<Employee> employees = List.of((Employee) user2, (Employee) user3);
 			((Manager) user1).setSubordinates(employees);
-			userRepository.save(user1);
+			userService.save(user1);
 			for (int i = 0; i < 5; i++){
 				LeaveApplication leaveApplication1 = new LeaveApplication();
 				leaveApplication1.setEmployee((Employee) user2);
-				leaveApplication1.setStartDate(LocalDateTime.now()); // today
-				leaveApplication1.setEndDate(LocalDateTime.now().plusDays(1)); // tomorrow
+				leaveApplication1.setStartDate(LocalDate.now()); // today
+				leaveApplication1.setEndDate(LocalDate.now().plusDays(1)); // tomorrow
 				leaveApplication1.setReason("Sick");
 				leaveApplication1.setStatus("Applied");
 				leaveApplication1.setType("Annual");
@@ -87,8 +88,8 @@ public class LapsBackendApplication {
 			for (int i = 0 ; i < 5; i++){
 				LeaveApplication leaveApplication2 = new LeaveApplication();
 				leaveApplication2.setEmployee((Employee) user3);
-				leaveApplication2.setStartDate(LocalDateTime.now().plusDays(1)); // tomorrow
-				leaveApplication2.setEndDate(LocalDateTime.now().plusDays(2)); // day after tomorrow
+				leaveApplication2.setStartDate(LocalDate.now().plusDays(1)); // tomorrow
+				leaveApplication2.setEndDate(LocalDate.now().plusDays(2)); // day after tomorrow
 				leaveApplication2.setReason("Sick");
 				leaveApplication2.setStatus("Approved");
 				leaveApplication2.setType("Annual");
@@ -102,7 +103,7 @@ public class LapsBackendApplication {
 			user4.setPassword("password123");
 			user4.setName("Test User 2");
 			user4.setRole("Admin");
-			userRepository.save(user4);
+			userService.save(user4);
 
 			PublicHolidays P1 = publicHolidayRepository
 					.save(new PublicHolidays(LocalDate.parse("2024-01-01"), "New Year"));
