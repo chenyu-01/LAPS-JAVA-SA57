@@ -19,9 +19,7 @@ import jakarta.persistence.Table;
 	
 	@Column(name = "name")
 	private String name;
-	
-	@Column(name = "description")
-	private String description;
+
 	
 	public Role() {}
 	
@@ -29,10 +27,10 @@ import jakarta.persistence.Table;
 	    this.roleId = roleId;
 	  }
 	
-	public Role(String roleId, String name,String description) {
+	public Role(String roleId, String name) {
 		this.roleId = roleId;
 		this.name = name;
-		this.description = description;
+
 	}
 
 	public String getRoleId() {
@@ -51,29 +49,5 @@ import jakarta.persistence.Table;
 		this.name = name;
 	}
 
-	public String getDescription() {
-		return description;
-	}
-
-	public void setDescription(String description) {
-		this.description = description;
-	}
-		
-	  @Override
-	  public int hashCode() {
-	    return Objects.hash(roleId);
-	  }
-
-	  @Override
-	  public boolean equals(Object obj) {
-	    if (this == obj)
-	      return true;
-	    if (obj == null)
-	      return false;
-	    if (getClass() != obj.getClass())
-	      return false;
-	    Role other = (Role) obj;
-	    return Objects.equals(roleId, other.roleId);
-	  }
 
 }
