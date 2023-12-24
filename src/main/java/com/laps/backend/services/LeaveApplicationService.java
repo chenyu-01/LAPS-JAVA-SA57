@@ -14,7 +14,7 @@ public interface LeaveApplicationService {
     public List<LeaveApplication> getAllAppliedApplications() ;
     public List<LeaveApplication> getAppliedApplicationsByEmployee(Employee employee);
 
-    void approveApplication(Long id);
+    Boolean approveApplication(Long id);
 
     void rejectApplication(Long id);
 
@@ -24,7 +24,7 @@ public interface LeaveApplicationService {
     Optional<LeaveApplication> findById(Long id);
 
     Optional<List<LeaveApplication>> getEmployeeAllApplications(Employee employee);
-    LeaveApplication saveApplication(LeaveApplication leaveApplication);
+    Boolean saveApplication(LeaveApplication leaveApplication);
 
     List<LeaveApplication> fuzzySearchApplication(String[] keywords);
     List<LeaveApplication> getAllApprovedApplications();

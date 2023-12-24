@@ -10,6 +10,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.jpa.domain.Specification;
 import org.springframework.stereotype.Service;
 
+import java.time.LocalDate;
 import java.time.temporal.ChronoUnit;
 import java.util.Arrays;
 import java.util.Collection;
@@ -109,7 +110,7 @@ public class LeaveApplicationServiceImpl implements LeaveApplicationService{
     }
 
     @Override
-    public void approveApplication(Long id) {
+    public Boolean approveApplication(Long id) {
         //check if application exists
          // leaveApplicationRepository.findById(id).orElseThrow(() -> new RuntimeException("Application not found"));
         //check if application is already approved
@@ -164,8 +165,15 @@ public class LeaveApplicationServiceImpl implements LeaveApplicationService{
         }
         //approve application
         application.setStatus("Approved");
-        leaveApplicationRepository.save(application);
-        userLeaveEntitlementService.save(userLeaveEntitlement);
+
+        Boolean isSave =  saveApplication(application);
+        if(isSave){
+            userLeaveEntitlementService.save(userLeaveEntitlement);
+            return true;
+        }else{
+            return false;
+        }
+
     }
 
     @Override
@@ -224,8 +232,46 @@ public class LeaveApplicationServiceImpl implements LeaveApplicationService{
 
 
     @Override
-    public LeaveApplication saveApplication(LeaveApplication leaveApplication){
-        return leaveApplicationRepository.save(leaveApplication);
+    public Boolean saveApplication(LeaveApplication leaveApplication){
+        if(leaveApplication.getStatus().equals("Applied") || leaveApplication.getStatus().equals("Approved") || leaveApplication.getStatus().equals("Updated")){
+            LocalDate startDate = leaveApplication.getStartDate();
+            boolean inContain = false;
+            List<LeaveApplication> appliedApplications = getAllAppliedApplications();
+            for(int i = 0; i < appliedApplications.size();i++){
+                if(!startDate.isAfter(appliedApplications.get(i).getEndDate()) || startDate.isEqual(appliedApplications.get(i).getEndDate())){
+                    inContain = true;
+                    break;
+                }
+            }
+            List<LeaveApplication> updatedApplications = getAllUpdatedApplications();
+            for(int i = 0; i < updatedApplications.size();i++){
+                if(!startDate.isAfter(updatedApplications.get(i).getEndDate()) || startDate.isEqual(updatedApplications.get(i).getEndDate())){
+                    inContain = true;
+                    break;
+                }
+            }
+            List<LeaveApplication> approvedApplications = getAllApprovedApplications();
+            for(int i = 0; i < approvedApplications.size();i++){
+                if(!startDate.isAfter(approvedApplications.get(i).getEndDate()) || startDate.isEqual(approvedApplications.get(i).getEndDate())){
+                    inContain = true;
+                    break;
+                }
+            }
+
+            if(!inContain){
+                leaveApplicationRepository.save(leaveApplication);
+                return true;
+            }
+
+            return false;
+        }else{
+            leaveApplicationRepository.save(leaveApplication);
+            return true;
+        }
+
+
+
+
     }
 
 
