@@ -9,9 +9,8 @@ import com.laps.backend.specification.UserSpecification;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.jpa.domain.Specification;
 import org.springframework.stereotype.Service;
-import jakarta.annotation.Resource;
 
-import java.time.Duration;
+import java.time.temporal.ChronoUnit;
 import java.util.Arrays;
 import java.util.Collection;
 import java.util.List;
@@ -24,13 +23,15 @@ public class LeaveApplicationServiceImpl implements LeaveApplicationService{
     private final UserRepository userRepository;
 
     private final PublicHolidayService publicHolidayService;
+    private final UserLeaveEntitlementService userLeaveEntitlementService;
 
     @Autowired
     public LeaveApplicationServiceImpl(LeaveApplicationRepository leaveApplicationRepository,
-                                       UserRepository userRepository, PublicHolidayService publicHolidayService) {
+                                       UserRepository userRepository, PublicHolidayService publicHolidayService, UserLeaveEntitlementService userLeaveEntitlementService) {
         this.leaveApplicationRepository = leaveApplicationRepository;
         this.userRepository = userRepository;
         this.publicHolidayService = publicHolidayService;
+        this.userLeaveEntitlementService = userLeaveEntitlementService;
     }
 
 
@@ -110,9 +111,13 @@ public class LeaveApplicationServiceImpl implements LeaveApplicationService{
     @Override
     public void approveApplication(Long id) {
         //check if application exists
-         leaveApplicationRepository.findById(id).orElseThrow(() -> new RuntimeException("Application not found"));
+         // leaveApplicationRepository.findById(id).orElseThrow(() -> new RuntimeException("Application not found"));
         //check if application is already approved
-        LeaveApplication application = leaveApplicationRepository.findById(id).get();
+        Optional<LeaveApplication> applicationOpt = leaveApplicationRepository.findById(id);
+        if (applicationOpt.isEmpty()) {
+            throw new RuntimeException("Application not found");
+        }
+        LeaveApplication application = applicationOpt.get();
         if (application.getStatus().equals("Approved")) {
             throw new RuntimeException("Application already approved");
         }
@@ -123,34 +128,35 @@ public class LeaveApplicationServiceImpl implements LeaveApplicationService{
         // Todo validate leave entitlement is enough
         String leaveType = application.getType();
         Employee employee = application.getEmployee();
-        Duration duration = Duration.between(application.getStartDate(), application.getEndDate());
+        long totalDays = ChronoUnit.DAYS.between(application.getStartDate(), application.getEndDate()) + 1;
+
         UserLeaveEntitlement userLeaveEntitlement = employee.getUserLeaveEntitlement();
-        if (duration.toDays() <= 14) {
-            duration = publicHolidayService.holidayWeekendDuration(application.getStartDate(), application.getEndDate());
+        if (totalDays <= 14) {
+            totalDays = publicHolidayService.holidayWeekendDuration(application.getStartDate(), application.getEndDate());
         }
         int annualEntitledDays = userLeaveEntitlement.getAnnualEntitledDays();
         int medicalEntitledDays = userLeaveEntitlement.getMedicalEntitledDays();
         float compensationEntitledDays = userLeaveEntitlement.getCompensationEntitledDays();
         switch (leaveType) {
             case "Annual":
-                if (annualEntitledDays < duration.toDays()) {
+                if (annualEntitledDays < totalDays) {
                     throw new RuntimeException("Annual leave entitlement not enough");
                 }
-                annualEntitledDays -= duration.toDays();
+                annualEntitledDays -= totalDays;
                 userLeaveEntitlement.setAnnualEntitledDays(annualEntitledDays);
                 break;
             case "Medical":
-                if (medicalEntitledDays < duration.toDays()) {
+                if (medicalEntitledDays < totalDays) {
                     throw new RuntimeException("Medical leave entitlement not enough");
                 }
-                medicalEntitledDays -= duration.toDays();
+                medicalEntitledDays -= totalDays;
                 userLeaveEntitlement.setMedicalEntitledDays(medicalEntitledDays);
                 break;
             case "Compensation":
-                if (compensationEntitledDays < duration.toDays()) {
+                if (compensationEntitledDays < totalDays) {
                     throw new RuntimeException("Compensation leave entitlement not enough");
                 }
-                compensationEntitledDays -= duration.toDays();
+                compensationEntitledDays -= totalDays;
                 userLeaveEntitlement.setCompensationEntitledDays(compensationEntitledDays);
                 break;
             default:
@@ -159,6 +165,7 @@ public class LeaveApplicationServiceImpl implements LeaveApplicationService{
         //approve application
         application.setStatus("Approved");
         leaveApplicationRepository.save(application);
+        userLeaveEntitlementService.save(userLeaveEntitlement);
     }
 
     @Override

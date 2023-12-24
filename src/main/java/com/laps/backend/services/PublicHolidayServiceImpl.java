@@ -2,6 +2,8 @@ package com.laps.backend.services;
 
 import java.time.Duration;
 import java.time.LocalDate;
+import java.time.Period;
+import java.time.temporal.ChronoUnit;
 import java.util.List;
 
 import org.springframework.beans.factory.annotation.Autowired;
@@ -13,8 +15,11 @@ import com.laps.backend.repositories.PublicHolidayRepository;
 @Service
 public class PublicHolidayServiceImpl implements PublicHolidayService{
 
-	@Autowired 
-	private PublicHolidayRepository publicHolidayRepository;
+	private final PublicHolidayRepository publicHolidayRepository;
+
+	public PublicHolidayServiceImpl(PublicHolidayRepository publicHolidayRepository1) {
+        this.publicHolidayRepository = publicHolidayRepository1;
+    }
 
 	@Override
 	public List<PublicHolidays> getAllPublicHolidays() {
@@ -23,9 +28,10 @@ public class PublicHolidayServiceImpl implements PublicHolidayService{
 	}
 
 	@Override
-	public Duration holidayWeekendDuration(LocalDate startDate, LocalDate endDate){
+	public long holidayWeekendDuration(LocalDate startDate, LocalDate endDate){
 		List<PublicHolidays> publicHolidays = publicHolidayRepository.findAll();
-		Duration duration = Duration.between(startDate, endDate);
+		long totalDays = ChronoUnit.DAYS.between(startDate, endDate.plusDays(1));
+
 		// calculate the duration of public holidays and weekends between startDate and endDate
 		while (startDate.isBefore(endDate)) {
 			for (PublicHolidays publicHoliday : publicHolidays) {
@@ -34,19 +40,16 @@ public class PublicHolidayServiceImpl implements PublicHolidayService{
 					break;
 				}
 				if (startDate.equals(publicHoliday.getDate())) {
-					duration = duration.minusDays(1);
+					totalDays -= 1;
 					break;
 				}
 			}
 			if (startDate.getDayOfWeek().getValue() == 6 || startDate.getDayOfWeek().getValue() == 7) {
-				duration = duration.minusDays(1);
+				totalDays -= 1;
 			}
 			startDate = startDate.plusDays(1);
 		}
-		return duration;
+		return totalDays;
 
 	}
-
-
-	
 }

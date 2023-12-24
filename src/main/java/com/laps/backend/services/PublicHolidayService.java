@@ -1,6 +1,5 @@
 package com.laps.backend.services;
 
-import java.time.Duration;
 import java.time.LocalDate;
 import java.util.List;
 
@@ -12,6 +11,6 @@ import com.laps.backend.models.PublicHolidays;
 public interface PublicHolidayService {
 
 	List<PublicHolidays> getAllPublicHolidays();
-	Duration holidayWeekendDuration(LocalDate startDate, LocalDate endDate);
+	long holidayWeekendDuration(LocalDate startDate, LocalDate endDate);
 
 }
