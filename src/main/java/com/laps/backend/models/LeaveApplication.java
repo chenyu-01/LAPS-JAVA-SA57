@@ -8,7 +8,7 @@ import lombok.AccessLevel;
 import lombok.Getter;
 import lombok.Setter;
 
-import java.time.LocalDateTime;
+import java.time.LocalDate;
 
 @Getter
 @Setter
@@ -19,9 +19,9 @@ public class LeaveApplication {
     @GeneratedValue(strategy = GenerationType.AUTO)
     private Long id;
     @Column(nullable = false)
-    private LocalDateTime startDate;
+    private LocalDate startDate;
     @Column(nullable = false)
-    private LocalDateTime endDate;
+    private LocalDate endDate;
     @Column(nullable = false)
      // Link to LeaveType.name
     private String type; // e.g., Annual, Medical, Compensation, etc.

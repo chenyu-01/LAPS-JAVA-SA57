@@ -76,8 +76,8 @@ public class LapsBackendApplication {
 			for (int i = 0; i < 5; i++){
 				LeaveApplication leaveApplication1 = new LeaveApplication();
 				leaveApplication1.setEmployee((Employee) user2);
-				leaveApplication1.setStartDate(LocalDateTime.now()); // today
-				leaveApplication1.setEndDate(LocalDateTime.now().plusDays(1)); // tomorrow
+				leaveApplication1.setStartDate(LocalDate.now()); // today
+				leaveApplication1.setEndDate(LocalDate.now().plusDays(1)); // tomorrow
 				leaveApplication1.setReason("Sick");
 				leaveApplication1.setStatus("Applied");
 				leaveApplication1.setType("Annual");
@@ -88,8 +88,8 @@ public class LapsBackendApplication {
 			for (int i = 0 ; i < 5; i++){
 				LeaveApplication leaveApplication2 = new LeaveApplication();
 				leaveApplication2.setEmployee((Employee) user3);
-				leaveApplication2.setStartDate(LocalDateTime.now().plusDays(1)); // tomorrow
-				leaveApplication2.setEndDate(LocalDateTime.now().plusDays(2)); // day after tomorrow
+				leaveApplication2.setStartDate(LocalDate.now().plusDays(1)); // tomorrow
+				leaveApplication2.setEndDate(LocalDate.now().plusDays(2)); // day after tomorrow
 				leaveApplication2.setReason("Sick");
 				leaveApplication2.setStatus("Approved");
 				leaveApplication2.setType("Annual");

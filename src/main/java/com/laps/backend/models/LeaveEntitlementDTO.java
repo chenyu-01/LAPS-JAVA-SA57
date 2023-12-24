@@ -8,7 +8,7 @@ import lombok.Setter;
 public class LeaveEntitlementDTO implements Serializable {
     private int annualLeaveDays;
     private int medicalLeaveDays;
-    private int compensationLeaveDays;
+    private float compensationLeaveDays;
 
     public LeaveEntitlementDTO(UserLeaveEntitlement other) {
         this.annualLeaveDays = other.getAnnualEntitledDays();

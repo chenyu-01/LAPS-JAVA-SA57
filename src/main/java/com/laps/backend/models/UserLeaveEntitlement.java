@@ -20,7 +20,7 @@ public class UserLeaveEntitlement {
 
     private int annualEntitledDays;
     private int medicalEntitledDays;
-    private int compensationEntitledDays;
+    private float compensationEntitledDays; // half day increment
 
 
     // Constructor, getters and setters
