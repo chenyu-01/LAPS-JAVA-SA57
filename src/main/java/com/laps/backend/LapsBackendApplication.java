@@ -32,9 +32,9 @@ public class LapsBackendApplication {
 		return args -> {
 
 			// Add a few Roles
-			Role admin = rolerepository.save(new Role("Admin", "Administrator", "System administrator"));
-			Role Employee = rolerepository.save(new Role("Employee", "Staff", "Staff members"));
-			Role Manager = rolerepository.save(new Role("Manager", "Manager", "Manager"));
+			Role admin = rolerepository.save(new Role("Admin", "Administrator"));
+			Role Employee = rolerepository.save(new Role("Employee", "Staff"));
+			Role Manager = rolerepository.save(new Role("Manager", "Manager"));
 
 			// Add Leave Type
 			LeaveType lt1 = leaveTypeRepository.save(new LeaveType("Admin",LeaveTypeEnum.MEDICAL, 60));
