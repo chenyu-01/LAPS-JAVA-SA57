@@ -177,7 +177,9 @@ After setting up the database, you can start the application:
 3. Run the following command to start the application:
 
 ./mvnw spring-boot:run
+
 Or, if you are using Windows:
+
 mvnw spring-boot:run
 
 The application should now start and be accessible. Ensure that the database server is running and accessible for the application to connect to.
