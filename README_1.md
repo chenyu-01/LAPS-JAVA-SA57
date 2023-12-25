@@ -144,14 +144,38 @@ First, you need to configure the database connection in the `application.propert
 
 1. Open the `application.properties` file located in the `src/main/resources` directory.
 2. Locate the following properties:
+   
 spring.datasource.username=
+
 spring.datasource.password=
+
 3. Replace the above lines with your MySQL username and password. For example:
+   
 spring.datasource.username=root
+
 spring.datasource.password=myPassword
+
 4. Ensure the `spring.datasource.url` property matches your local MySQL setup:
+   
 spring.datasource.url=jdbc:mysql://localhost:3306/SA
+
 spring.datasource.url=jdbc:mysql://localhost:3306/SA
+
+## Step 2: Prepare the Database
+
+Before running the application, set up the required database tables:
+
+1. Start your MySQL server.
+2. Run the `spring_session.sql` script located in your project directory. This script creates the necessary tables in your MySQL database.
+
+## Step 3: Start the Application
+
+After setting up the database, you can start the application:
+
+1. Open a terminal or command prompt.
+2. Navigate to the root directory of your Java project.
+3. Run the following command to start the application:
+
 ./mvnw spring-boot:run
 Or, if you are using Windows:
 mvnw spring-boot:run
