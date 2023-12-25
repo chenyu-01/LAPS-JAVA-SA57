@@ -38,7 +38,7 @@ public class LeaveApplication {
     @ManyToOne
     @JoinColumn(name = "employee_id", nullable = false)
     private Employee employee; // Employee who applied for the leave
-
+    private long entitlementSubtraction; // Number of days excluding weekends and public holidays
 
     public LeaveApplication() {
 

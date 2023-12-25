@@ -22,6 +22,8 @@ public class LeaveApplicationDTO implements Serializable {
     private String reason;
     private String contactInfo;
     private String employeeId;
+    private boolean isOverseas;
+    private String workDissemination;
     private static final DateTimeFormatter df = DateTimeFormatter.ofPattern("yyyy-MM-dd");
     public LeaveApplicationDTO(LeaveApplication other) {
         this.id = other.getId().toString();
@@ -33,5 +35,7 @@ public class LeaveApplicationDTO implements Serializable {
         this.reason = other.getReason();
         this.employeeId = other.getEmployee().getId().toString();
         this.contactInfo = other.getContactInfo();
+        this.isOverseas = other.getIsOverseas();
+        this.workDissemination = other.getWorkDissemination();
     }
 }

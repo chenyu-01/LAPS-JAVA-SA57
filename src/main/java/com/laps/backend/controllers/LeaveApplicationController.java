@@ -6,14 +6,13 @@ import com.laps.backend.models.LeaveApplication;
 import com.laps.backend.models.LeaveApplicationDTO;
 import com.laps.backend.services.EmployeeService;
 import com.laps.backend.services.LeaveApplicationService;
+import com.laps.backend.services.UserLeaveEntitlementService;
 import com.laps.backend.services.UserService;
-import com.laps.backend.validators.LeaveApplicationValidator;
 import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.validation.BindingResult;
-import org.springframework.web.bind.WebDataBinder;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.ArrayList;
@@ -30,20 +29,18 @@ public class LeaveApplicationController {
     private final LeaveApplicationService leaveApplicationService;
     private final EmployeeService employeeService;
 
-    @Autowired
-    private LeaveApplicationValidator leaveApplicationValidator;
+    private final UserLeaveEntitlementService userLeaveEntitlementService;
 
-    @InitBinder("leaveApplicationBinder")
-    protected void initBinder(WebDataBinder binder) {
-        binder.addValidators(leaveApplicationValidator);
-    }
+
+
 
 
     @Autowired
-    public LeaveApplicationController(LeaveApplicationService leaveApplicationService, UserService userService, EmployeeService employeeService) {
+    public LeaveApplicationController(LeaveApplicationService leaveApplicationService, UserService userService, EmployeeService employeeService, UserLeaveEntitlementService userLeaveEntitlementService) {
         this.leaveApplicationService = leaveApplicationService;
         this.employeeService = employeeService;
         this.userService = userService;
+        this.userLeaveEntitlementService = userLeaveEntitlementService;
     }
     // Get all leave applications
     @GetMapping("/applied")
@@ -105,6 +102,7 @@ public class LeaveApplicationController {
     public ResponseEntity<?> rejectLeaveApplication(@PathVariable Long id) {
         try {
             leaveApplicationService.rejectApplication(id);
+            addEntitlementBack(leaveApplicationService.findById(id).get());
             return ResponseEntity.ok().build();
         } catch (Exception e) {
             return ResponseEntity.badRequest().body(e.getMessage());
@@ -156,8 +154,8 @@ public class LeaveApplicationController {
     public ResponseEntity<?> updateEmployeeApplication(@RequestBody @Valid LeaveApplication leaveApplicationBody, BindingResult result) {
         Map<String , Object> response = new HashMap<>();
         if (result.hasErrors()) {
-            // Handle validation errors
-            return new ResponseEntity<>(result.getAllErrors(), HttpStatus.BAD_REQUEST);
+            response.put("message", "Invalid Leave Application");
+            return new ResponseEntity<>(response, HttpStatus.BAD_REQUEST);
         }
         Long leaveId = leaveApplicationBody.getId();
         Optional<LeaveApplication> optleaveApplication = leaveApplicationService.findById(leaveId);
@@ -167,13 +165,14 @@ public class LeaveApplicationController {
         }
         LeaveApplication prevApplication = optleaveApplication.get();
         String status = prevApplication.getStatus();
-        if (status.equals("Approved") || status.equals("Rejected") || status.equals("Cancelled")) {
-            response.put("message", "Cannot Update Application that is Approved, Rejected or Cancelled");
+        if (!status.equals("Applied") && !status.equals("Updated")) {
+            response.put("message", "Cannot Update Application that is Submitted");
             return new ResponseEntity<>(response, HttpStatus.NOT_ACCEPTABLE);
         }
         leaveApplicationBody.setStatus("Updated");
         leaveApplicationBody.setEmployee(prevApplication.getEmployee());
         try {
+            addEntitlementBack(prevApplication);
             leaveApplicationService.saveApplication(leaveApplicationBody);
             response.put("message", "Successfully Updated Application");
             return new ResponseEntity<>(response, HttpStatus.OK);
@@ -183,37 +182,74 @@ public class LeaveApplicationController {
         }
     }
 
+    private void addEntitlementBack(LeaveApplication prevApplication) {
+        // add entitlementSubtraction back to userLeaveEntitlement
+        UserLeaveEntitlement userLeaveEntitlement = prevApplication.getEmployee().getUserLeaveEntitlement();
+        String prevType = prevApplication.getType();
+        long entitlementSubtraction = prevApplication.getEntitlementSubtraction();
+        if (prevType.equals("Annual")) {
+            int prevAnnual = (int) (userLeaveEntitlement.getAnnualEntitledDays() + entitlementSubtraction);
+            userLeaveEntitlement.setAnnualEntitledDays(prevAnnual);
+        } else if (prevType.equals("Medical")) {
+            int prevMedical = (int) (userLeaveEntitlement.getMedicalEntitledDays() + entitlementSubtraction);
+            userLeaveEntitlement.setMedicalEntitledDays(prevMedical);
+        } else if (prevType.equals("Compensation")) {
+            float prevCompensation = userLeaveEntitlement.getCompensationEntitledDays() + entitlementSubtraction;
+            userLeaveEntitlement.setCompensationEntitledDays(prevCompensation);
+        }
+    }
+
     @PutMapping("/cancel/{id}")
     public ResponseEntity<?> cancelEmployeeApplication(@PathVariable("id") Long leaveId) {
             Optional<LeaveApplication> optleaveApplication = leaveApplicationService.findById(leaveId);
-            if (optleaveApplication.isPresent()) {
-                LeaveApplication leaveApplication = optleaveApplication.get();
-                if (!leaveApplication.getStatus().equals("Approved")) {
-                    return new ResponseEntity<LeaveApplicationDTO>(HttpStatus.NOT_ACCEPTABLE);
-                }
-                leaveApplication.setStatus("Cancelled");
-                leaveApplicationService.saveApplication(leaveApplication);
-                return new  ResponseEntity<>("Cancelled Application", HttpStatus.OK);
+            Map<String, Object> response = new HashMap<>();
+        if (optleaveApplication.isEmpty()) {
+            response.put("message", "Application Not Found");
+            return new ResponseEntity<>( response,HttpStatus.NOT_FOUND);
+        }
+        LeaveApplication leaveApplication = optleaveApplication.get();
+        if (!leaveApplication.getStatus().equals("Approved")) {
+            response.put("message", "Cannot Cancel Application that is not Approved");
+            return new ResponseEntity<>(response, HttpStatus.NOT_ACCEPTABLE);
+        }
+        leaveApplication.setStatus("Cancelled");
+        try {
+            addEntitlementBack(leaveApplication);
+            leaveApplicationService.saveApplication(leaveApplication);
+        } catch (RuntimeException e) {
+            response.put("message", e.getMessage());
+            return new ResponseEntity<>(response, HttpStatus.NOT_ACCEPTABLE);
+        }
+        response.put("message", "Application Successfully Cancelled");
+        return new  ResponseEntity<>(response, HttpStatus.OK);
 
-            }
-            return new ResponseEntity<>("Application Not Found" ,HttpStatus.NOT_FOUND);
     }
 
 
     @DeleteMapping("/delete/{id}")
-        public ResponseEntity<String> deleteEmployeeApplication(@PathVariable("id") Long leaveId) {
+        public ResponseEntity<?> deleteEmployeeApplication(@PathVariable("id") Long leaveId) {
             Optional<LeaveApplication> optleaveApplication = leaveApplicationService.findById(leaveId);
+            Map<String, Object> response = new HashMap<>();
             if (optleaveApplication.isEmpty()) {
-                return new ResponseEntity<>("Application Not Found", HttpStatus.NOT_FOUND);
+                response.put("message", "Application Not Found");
+                return new ResponseEntity<>(response, HttpStatus.NOT_FOUND);
             }
             String status = optleaveApplication.get().getStatus();
-            if (status.equals(("Approved")) || status.equals("Rejected")) {
-                return new ResponseEntity<>("Cannot Delete Application that is Approved Or Rejected", HttpStatus.NOT_ACCEPTABLE);
+            if (!status.equals(("Applied")) && !status.equals("Updated")) {
+                response.put("message", "Cannot Delete Application that is not Applied or Updated");
+                return new ResponseEntity<>(response, HttpStatus.NOT_ACCEPTABLE);
             }
             LeaveApplication leaveApplication = optleaveApplication.get();
             leaveApplication.setStatus("Deleted");
-            leaveApplicationService.saveApplication(leaveApplication);
-            return new ResponseEntity<>("Application Successfully Deleted", HttpStatus.OK);
+            try {
+                addEntitlementBack(leaveApplication);
+                leaveApplicationService.saveApplication(leaveApplication);
+            } catch (RuntimeException e) {
+                response.put("message", e.getMessage());
+                return new ResponseEntity<>(response, HttpStatus.NOT_ACCEPTABLE);
+            }
+            response.put("message", "Application Successfully Deleted");
+            return new ResponseEntity<>(response, HttpStatus.OK);
 
     }
 
@@ -223,7 +259,6 @@ public class LeaveApplicationController {
         if (result.hasErrors()) {
             // Handle validation errors
             response.put("message", "Invalid Leave Application");
-            response.put("errors", result.getAllErrors());
             return new ResponseEntity<>(response, HttpStatus.BAD_REQUEST);
         }
         Optional<Employee> optEmployee = employeeService.findById(inid);

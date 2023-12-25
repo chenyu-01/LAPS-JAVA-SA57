@@ -71,7 +71,7 @@ public class PublicHolidayController {
 	}
 
 	@GetMapping("/delete/{id}")
-	public String deletePublicHoliday(@PathVariable long id){
+	public String deletePublicHoliday(@PathVariable long id) {
 //		Optional<PublicHolidays> publicHolidays = publicHolidayService.findPublicHolidaysById(id);
 		publicHolidayService.deletePublicHolidayById(id);
 		return "redirect:/publicholidays/list";
