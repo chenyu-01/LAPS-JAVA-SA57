@@ -43,7 +43,7 @@ private final AdminServiceImpl adminService;
 
 
     @PutMapping("/{id}")
-    public ResponseEntity<User> updateUser(@PathVariable Long id, @RequestBody Map<String, Object> userData) {
+    public ResponseEntity<?> updateUser(@PathVariable Long id, @RequestBody Map<String, Object> userData) {
         User user = adminService.getUserById(id)
                 .orElseThrow(() -> new IllegalArgumentException("User not found with id: " + id));
         //check if user match
@@ -62,7 +62,8 @@ private final AdminServiceImpl adminService;
                             throw new IllegalArgumentException("Manager not found with name: " + userData.get("authName"));
                         ((Employee) user).setManager(manager);
                     }
-                    return ResponseEntity.ok(adminService.updateUser(user));
+                    adminService.updateUser(user);
+                    return ResponseEntity.ok().build();
                 }
                 case "Admin" :
                     return ResponseEntity.ok(user);
@@ -93,7 +94,7 @@ private final AdminServiceImpl adminService;
             }
         }
         User updatedUser = adminService.updateUser(id, user);
-        return ResponseEntity.ok(updatedUser);
+        return ResponseEntity.ok().build();
     }
 
     @DeleteMapping("/{id}")

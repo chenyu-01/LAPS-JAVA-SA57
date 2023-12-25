@@ -13,6 +13,7 @@ import com.laps.backend.repositories.UserRepository;
 import com.laps.backend.repositories.RoleRepository;
 import com.laps.backend.repositories.LeaveTypeRepository;
 import com.laps.backend.repositories.PublicHolidayRepository;
+import org.springframework.session.jdbc.config.annotation.web.http.EnableJdbcHttpSession;
 
 import java.time.LocalDate;
 import java.time.LocalDateTime;

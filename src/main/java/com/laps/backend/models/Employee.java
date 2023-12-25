@@ -1,5 +1,6 @@
 package com.laps.backend.models;
 
+import com.fasterxml.jackson.annotation.JsonManagedReference;
 import jakarta.persistence.*;
 import lombok.Getter;
 import lombok.Setter;
@@ -10,8 +11,10 @@ import java.util.List;
 @Getter @Setter
 public class Employee extends User{
 
+
     @ManyToOne
     @JoinColumn(name = "manager_id")
+    @JsonManagedReference
     private Manager manager; // explicitly set manager_id foreign key column in employee table
     @OneToMany(mappedBy = "employee",cascade = CascadeType.REMOVE)
     private List<LeaveApplication> leaveApplications;
