@@ -216,19 +216,19 @@ public class LeaveApplicationServiceImpl implements LeaveApplicationService{
         LocalDate endDate = leaveApplication.getEndDate();
         List<LeaveApplication> appliedApplications = getAllAppliedApplications();
         for (LeaveApplication appliedApplication : appliedApplications) {
-            if (startDate.isBefore(appliedApplication.getEndDate()) || endDate.isAfter(appliedApplication.getStartDate())) {
+            if (!startDate.isAfter(appliedApplication.getEndDate()) && !endDate.isBefore(appliedApplication.getStartDate())) {
                 throw new RuntimeException("Leave application date conflict");
             }
         }
         List<LeaveApplication> updatedApplications = getAllUpdatedApplications();
         for (LeaveApplication updatedApplication : updatedApplications) {
-            if (startDate.isBefore(updatedApplication.getEndDate()) || endDate.isAfter(updatedApplication.getStartDate())) {
+            if (!startDate.isAfter(updatedApplication.getEndDate()) && !endDate.isBefore(updatedApplication.getStartDate())) {
                 throw new RuntimeException("Leave application date conflict");
             }
         }
         List<LeaveApplication> approvedApplications = getAllApprovedApplications();
         for (LeaveApplication approvedApplication : approvedApplications) {
-            if (startDate.isBefore(approvedApplication.getEndDate()) || endDate.isAfter(approvedApplication.getStartDate())) {
+            if (!startDate.isAfter(approvedApplication.getEndDate()) && !endDate.isBefore(approvedApplication.getStartDate())) {
                 throw new RuntimeException("Leave application date conflict");
             }
         }
