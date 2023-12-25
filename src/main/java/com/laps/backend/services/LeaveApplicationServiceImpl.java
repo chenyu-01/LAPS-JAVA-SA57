@@ -210,7 +210,7 @@ public class LeaveApplicationServiceImpl implements LeaveApplicationService{
             }
         }
 
-        // validate enough leave entitlement
+        // validate leave entitlement
         String leaveType = leaveApplication.getType();
         long totalDays = ChronoUnit.DAYS.between(leaveApplication.getStartDate(), leaveApplication.getEndDate()) + 1;
 
@@ -218,6 +218,7 @@ public class LeaveApplicationServiceImpl implements LeaveApplicationService{
         if (totalDays <= 14) {
             totalDays = publicHolidayService.holidayWeekendDuration(leaveApplication.getStartDate(), leaveApplication.getEndDate());
         }
+        leaveApplication.setEntitlementSubtraction(totalDays);
         int annualEntitledDays = userLeaveEntitlement.getAnnualEntitledDays();
         int medicalEntitledDays = userLeaveEntitlement.getMedicalEntitledDays();
         float compensationEntitledDays = userLeaveEntitlement.getCompensationEntitledDays();

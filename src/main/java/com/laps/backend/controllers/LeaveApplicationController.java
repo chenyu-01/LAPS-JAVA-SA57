@@ -6,6 +6,7 @@ import com.laps.backend.models.LeaveApplication;
 import com.laps.backend.models.LeaveApplicationDTO;
 import com.laps.backend.services.EmployeeService;
 import com.laps.backend.services.LeaveApplicationService;
+import com.laps.backend.services.UserLeaveEntitlementService;
 import com.laps.backend.services.UserService;
 import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -28,15 +29,18 @@ public class LeaveApplicationController {
     private final LeaveApplicationService leaveApplicationService;
     private final EmployeeService employeeService;
 
+    private final UserLeaveEntitlementService userLeaveEntitlementService;
+
 
 
 
 
     @Autowired
-    public LeaveApplicationController(LeaveApplicationService leaveApplicationService, UserService userService, EmployeeService employeeService) {
+    public LeaveApplicationController(LeaveApplicationService leaveApplicationService, UserService userService, EmployeeService employeeService, UserLeaveEntitlementService userLeaveEntitlementService) {
         this.leaveApplicationService = leaveApplicationService;
         this.employeeService = employeeService;
         this.userService = userService;
+        this.userLeaveEntitlementService = userLeaveEntitlementService;
     }
     // Get all leave applications
     @GetMapping("/applied")
@@ -98,6 +102,7 @@ public class LeaveApplicationController {
     public ResponseEntity<?> rejectLeaveApplication(@PathVariable Long id) {
         try {
             leaveApplicationService.rejectApplication(id);
+            addEntitlementBack(leaveApplicationService.findById(id).get());
             return ResponseEntity.ok().build();
         } catch (Exception e) {
             return ResponseEntity.badRequest().body(e.getMessage());
@@ -167,6 +172,7 @@ public class LeaveApplicationController {
         leaveApplicationBody.setStatus("Updated");
         leaveApplicationBody.setEmployee(prevApplication.getEmployee());
         try {
+            addEntitlementBack(prevApplication);
             leaveApplicationService.saveApplication(leaveApplicationBody);
             response.put("message", "Successfully Updated Application");
             return new ResponseEntity<>(response, HttpStatus.OK);
@@ -174,6 +180,25 @@ public class LeaveApplicationController {
             response.put("message", e.getMessage());
             return new ResponseEntity<>(response, HttpStatus.NOT_ACCEPTABLE);
         }
+    }
+
+    private void addEntitlementBack(LeaveApplication prevApplication) {
+        // add entitlementSubtraction back to userLeaveEntitlement
+        UserLeaveEntitlement userLeaveEntitlement = prevApplication.getEmployee().getUserLeaveEntitlement();
+        String prevType = prevApplication.getType();
+        long entitlementSubtraction = prevApplication.getEntitlementSubtraction();
+        if (prevType.equals("Annual")) {
+            int prevAnnual = (int) (userLeaveEntitlement.getAnnualEntitledDays() + entitlementSubtraction);
+            userLeaveEntitlement.setAnnualEntitledDays(prevAnnual);
+        } else if (prevType.equals("Medical")) {
+            int prevMedical = (int) (userLeaveEntitlement.getMedicalEntitledDays() + entitlementSubtraction);
+            userLeaveEntitlement.setMedicalEntitledDays(prevMedical);
+        } else if (prevType.equals("Compensation")) {
+            float prevCompensation = userLeaveEntitlement.getCompensationEntitledDays() + entitlementSubtraction;
+            userLeaveEntitlement.setCompensationEntitledDays(prevCompensation);
+        }
+        // save to database
+        userLeaveEntitlementService.save(userLeaveEntitlement);
     }
 
     @PutMapping("/cancel/{id}")
@@ -190,7 +215,13 @@ public class LeaveApplicationController {
             return new ResponseEntity<>(response, HttpStatus.NOT_ACCEPTABLE);
         }
         leaveApplication.setStatus("Cancelled");
-        leaveApplicationService.saveApplication(leaveApplication);
+        try {
+            addEntitlementBack(leaveApplication);
+            leaveApplicationService.saveApplication(leaveApplication);
+        } catch (RuntimeException e) {
+            response.put("message", e.getMessage());
+            return new ResponseEntity<>(response, HttpStatus.NOT_ACCEPTABLE);
+        }
         response.put("message", "Application Successfully Cancelled");
         return new  ResponseEntity<>(response, HttpStatus.OK);
 
@@ -212,7 +243,13 @@ public class LeaveApplicationController {
             }
             LeaveApplication leaveApplication = optleaveApplication.get();
             leaveApplication.setStatus("Deleted");
-            leaveApplicationService.saveApplication(leaveApplication);
+            try {
+                addEntitlementBack(leaveApplication);
+                leaveApplicationService.saveApplication(leaveApplication);
+            } catch (RuntimeException e) {
+                response.put("message", e.getMessage());
+                return new ResponseEntity<>(response, HttpStatus.NOT_ACCEPTABLE);
+            }
             response.put("message", "Application Successfully Deleted");
             return new ResponseEntity<>(response, HttpStatus.OK);
 
