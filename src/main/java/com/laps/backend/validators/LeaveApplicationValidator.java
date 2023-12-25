@@ -34,4 +34,5 @@ public class LeaveApplicationValidator implements Validator {
             }
         }
     }
+
 }
