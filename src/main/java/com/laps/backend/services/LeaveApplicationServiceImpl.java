@@ -195,7 +195,8 @@ public class LeaveApplicationServiceImpl implements LeaveApplicationService{
 
     @Override
     public Boolean saveApplication(LeaveApplication leaveApplication){
-        if(leaveApplication.getStatus().equals("Canceled") || leaveApplication.getStatus().equals("Deleted") || leaveApplication.getStatus().equals("Rejected") || leaveApplication.getStatus().equals("Approved")){
+        String status = leaveApplication.getStatus();
+        if(status.equals("Canceled") || status.equals("Deleted") || status.equals("Rejected") || status.equals("Approved")){
             leaveApplicationRepository.save(leaveApplication);
             return true;
         }
