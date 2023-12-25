@@ -6,6 +6,9 @@ import jakarta.validation.constraints.Size;
 import lombok.AccessLevel;
 import lombok.Setter;
 import lombok.Getter;
+
+import java.util.List;
+
 @Setter @Getter
 @Entity
 @Table(name = "app_user")
@@ -29,6 +32,10 @@ public class User {
     @Size(min = 8, max = 20)
     @Column(nullable = false)
     private String password;
+
+    @OneToOne
+    @JoinColumn(name = "userEntitlementId")
+    private UserLeaveEntitlement userLeaveEntitlement;
 
     // Relationships e.g., OneToMany for leave applications
     public  User() {

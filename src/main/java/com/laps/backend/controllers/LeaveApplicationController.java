@@ -96,9 +96,15 @@ public class LeaveApplicationController {
     }
     @PutMapping("/approve/{id}")
     public ResponseEntity<?> approveLeaveApplication(@PathVariable Long id) {
+        Map<String , Object> response = new HashMap<>();
         try {
-            leaveApplicationService.approveApplication(id);
-            return ResponseEntity.ok().build();
+            Boolean isApprove =  leaveApplicationService.approveApplication(id);
+            if(isApprove){
+                return ResponseEntity.ok().build();
+            }else{
+                response.put("message", "Period conflict with other applications");
+                return new ResponseEntity<>(response, HttpStatus.NOT_ACCEPTABLE);
+            }
         } catch (Exception e) {
             return ResponseEntity.badRequest().body(e.getMessage());
         }
@@ -177,9 +183,13 @@ public class LeaveApplicationController {
         }
         leaveApplicationBody.setStatus("Updated");
         leaveApplicationBody.setEmployee(prevApplication.getEmployee());
-        leaveApplicationService.saveApplication(leaveApplicationBody);
-        response.put("message", "Successfully Update Application");
-        return new ResponseEntity<>(response, HttpStatus.OK);
+        Boolean isSave =  leaveApplicationService.saveApplication(leaveApplicationBody);
+        if(isSave){
+            response.put("message", "Successfully Update Application");
+            return new ResponseEntity<>(response, HttpStatus.OK);
+        }
+        response.put("message", "Period conflict with other applications");
+        return new ResponseEntity<>(response, HttpStatus.NOT_ACCEPTABLE);
     }
 
     @PutMapping("/cancel/{id}")
@@ -193,6 +203,7 @@ public class LeaveApplicationController {
                 leaveApplication.setStatus("Cancelled");
                 leaveApplicationService.saveApplication(leaveApplication);
                 return new  ResponseEntity<String>("Cancelled Application", HttpStatus.OK);
+
             }
             return new ResponseEntity<String>("Application Not Found" ,HttpStatus.NOT_FOUND);
     }
