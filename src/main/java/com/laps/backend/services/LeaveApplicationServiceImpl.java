@@ -6,9 +6,11 @@ import com.laps.backend.repositories.LeaveApplicationRepository;
 import com.laps.backend.repositories.UserRepository;
 import com.laps.backend.specification.LeaveApplicationSpecification;
 import com.laps.backend.specification.UserSpecification;
+import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.jpa.domain.Specification;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDate;
 import java.time.temporal.ChronoUnit;
@@ -19,6 +21,7 @@ import java.util.Optional;
 import java.util.stream.Stream;
 
 @Service
+@Transactional
 public class LeaveApplicationServiceImpl implements LeaveApplicationService{
     private final LeaveApplicationRepository leaveApplicationRepository;
     private final UserRepository userRepository;
@@ -174,8 +177,41 @@ public class LeaveApplicationServiceImpl implements LeaveApplicationService{
             leaveApplicationRepository.save(leaveApplication);
             return true;
         }
-        String leaveType = leaveApplication.getType();
+        LocalDate startDate = leaveApplication.getStartDate();
+        LocalDate endDate = leaveApplication.getEndDate();
+        // validate application itself
+        if (startDate == null || endDate == null) {
+            throw new RuntimeException("Start date and end date are required");
+        }
+        if (startDate.isAfter(endDate)) {
+            throw new RuntimeException("Start date cannot be after end date");
+        }
+        if (startDate.isBefore(LocalDate.now())) {
+            throw new RuntimeException("Start date cannot be before today");
+        }
+        // if overseas leave, must have a valid contact Info
+        if (leaveApplication.getIsOverseas()) {
+            if (leaveApplication.getContactInfo() == null || leaveApplication.getContactInfo().isEmpty()) {
+                throw new RuntimeException("Contact info is required for overseas leave");
+            }
+        }
+        // validate date conflict with existing leave applications
         Employee employee = leaveApplication.getEmployee();
+        List<LeaveApplication> leaveApplicationList = getEmployeeAllApplications(employee).orElseThrow(() -> new RuntimeException("Employee not found"));
+        // filter out deleted and cancelled and rejected applications, only check with approved, applied and updated applications
+        leaveApplicationList = leaveApplicationList.stream().filter(la -> !la.getStatus().equals("Deleted") && !la.getStatus().equals("Canceled") && !la.getStatus().equals("Rejected")).toList();
+        for (LeaveApplication la : leaveApplicationList) {
+            if (!startDate.isAfter(la.getEndDate()) && !endDate.isBefore(la.getStartDate())) {
+                // if compare with same application, skip
+                if (la.getId().equals(leaveApplication.getId())) {
+                    continue;
+                }
+                throw new RuntimeException("Leave application date conflict");
+            }
+        }
+
+        // validate enough leave entitlement
+        String leaveType = leaveApplication.getType();
         long totalDays = ChronoUnit.DAYS.between(leaveApplication.getStartDate(), leaveApplication.getEndDate()) + 1;
 
         UserLeaveEntitlement userLeaveEntitlement = employee.getUserLeaveEntitlement();
@@ -210,35 +246,9 @@ public class LeaveApplicationServiceImpl implements LeaveApplicationService{
             default:
                 throw new RuntimeException("Leave type not found");
         }
-        boolean inContain = false;
-
-        LocalDate startDate = leaveApplication.getStartDate();
-        LocalDate endDate = leaveApplication.getEndDate();
-        List<LeaveApplication> appliedApplications = getAllAppliedApplications();
-        for (LeaveApplication appliedApplication : appliedApplications) {
-            if (!startDate.isAfter(appliedApplication.getEndDate()) && !endDate.isBefore(appliedApplication.getStartDate())) {
-                throw new RuntimeException("Leave application date conflict");
-            }
-        }
-        List<LeaveApplication> updatedApplications = getAllUpdatedApplications();
-        for (LeaveApplication updatedApplication : updatedApplications) {
-            if (!startDate.isAfter(updatedApplication.getEndDate()) && !endDate.isBefore(updatedApplication.getStartDate())) {
-                throw new RuntimeException("Leave application date conflict");
-            }
-        }
-        List<LeaveApplication> approvedApplications = getAllApprovedApplications();
-        for (LeaveApplication approvedApplication : approvedApplications) {
-            if (!startDate.isAfter(approvedApplication.getEndDate()) && !endDate.isBefore(approvedApplication.getStartDate())) {
-                throw new RuntimeException("Leave application date conflict");
-            }
-        }
-
-        if(!inContain){
-            leaveApplicationRepository.save(leaveApplication);
-            userLeaveEntitlementService.save(userLeaveEntitlement);
-            return true;
-        }
-        return false;
+        leaveApplicationRepository.save(leaveApplication);
+        userLeaveEntitlementService.save(userLeaveEntitlement);
+        return true;
     }
 
 
