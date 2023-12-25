@@ -21,8 +21,8 @@ public class UserLeaveEntitlementServiceImpl implements UserLeaveEntitlementServ
     }
 
     @Override
-    public void save(UserLeaveEntitlement newEntitlement) {
-        userLeaveEntitlementRepository.save(newEntitlement);
+    public UserLeaveEntitlement save(UserLeaveEntitlement newEntitlement) {
+        return userLeaveEntitlementRepository.save(newEntitlement);
     }
 
 }

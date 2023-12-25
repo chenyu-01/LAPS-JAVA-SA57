@@ -8,6 +8,7 @@ import java.util.List;
 import java.util.Optional;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+
 import com.laps.backend.models.PublicHolidays;
 import com.laps.backend.repositories.PublicHolidayRepository;
 import org.springframework.transaction.annotation.Transactional;
@@ -56,7 +57,7 @@ public class PublicHolidayServiceImpl implements PublicHolidayService{
 
 	public long holidayWeekendDuration(LocalDate startDate, LocalDate endDate){
 		List<PublicHolidays> publicHolidays = publicHolidayRepository.findAll();
-		long totalDays = ChronoUnit.DAYS.between(startDate, endDate.plusDays(1));
+		long totalDays = ChronoUnit.DAYS.between(startDate, endDate);
 
 		// calculate the duration of public holidays and weekends between startDate and endDate
 		while (startDate.isBefore(endDate)) {

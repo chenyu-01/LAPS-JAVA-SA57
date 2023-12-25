@@ -111,29 +111,102 @@ public class LeaveApplicationServiceImpl implements LeaveApplicationService{
 
     @Override
     public Boolean approveApplication(Long id) {
-        //check if application exists
+        //check if leaveApplication exists
          // leaveApplicationRepository.findById(id).orElseThrow(() -> new RuntimeException("Application not found"));
-        //check if application is already approved
-        Optional<LeaveApplication> applicationOpt = leaveApplicationRepository.findById(id);
-        if (applicationOpt.isEmpty()) {
+        //check if leaveApplication is already approved
+        Optional<LeaveApplication> leaveApplicationOpt = leaveApplicationRepository.findById(id);
+        if (leaveApplicationOpt.isEmpty()) {
             throw new RuntimeException("Application not found");
         }
-        LeaveApplication application = applicationOpt.get();
-        if (application.getStatus().equals("Approved")) {
+        LeaveApplication leaveApplication = leaveApplicationOpt.get();
+        if (leaveApplication.getStatus().equals("Approved")) {
             throw new RuntimeException("Application already approved");
         }
-        //check if application is already rejected
-        if (application.getStatus().equals("Rejected")) {
+        //check if leaveApplication is already rejected
+        if (leaveApplication.getStatus().equals("Rejected")) {
             throw new RuntimeException("Application already rejected");
         }
-        // Todo validate leave entitlement is enough
-        String leaveType = application.getType();
-        Employee employee = application.getEmployee();
-        long totalDays = ChronoUnit.DAYS.between(application.getStartDate(), application.getEndDate()) + 1;
+
+        //approve leaveApplication
+        leaveApplication.setStatus("Approved");
+
+        Boolean isSave =  saveApplication(leaveApplication);
+        if(isSave){
+
+            return true;
+        }
+        return false;
+    }
+
+    @Override
+    public void rejectApplication(Long id) {
+        //check if leaveApplication exists
+        leaveApplicationRepository.findById(id).orElseThrow(() -> new RuntimeException("Application not found"));
+        //check if leaveApplication is already approved
+        LeaveApplication leaveApplication = leaveApplicationRepository.findById(id).get();
+        if (leaveApplication.getStatus().equals("Approved")) {
+            throw new RuntimeException("Application already approved");
+        }
+        //check if leaveApplication is already rejected
+        if (leaveApplication.getStatus().equals("Rejected")) {
+            throw new RuntimeException("Application already rejected");
+        }
+        //reject leaveApplication
+        leaveApplication.setStatus("Rejected");
+        leaveApplicationRepository.save(leaveApplication);
+    }
+
+    @Override
+    public void addCommentToApplication(Long id, String comment) {
+        //check if leaveApplication exists
+        leaveApplicationRepository.findById(id).orElseThrow(() -> new RuntimeException("Application not found"));
+        //add comment to leaveApplication
+        LeaveApplication leaveApplication = leaveApplicationRepository.findById(id).get();
+        leaveApplication.setComment(comment);
+        leaveApplicationRepository.save(leaveApplication);
+    }
+
+    @Override
+    public List<LeaveApplication> fuzzySearchApplication(String[] keywords) {
+        List<String> leaveApplication_fields = Arrays.asList("type", "reason", "contactInfo");
+        List<String> user_fields = Arrays.asList("name", "email", "role");
+
+        Specification<LeaveApplication> leaveApplication_spec = LeaveApplicationSpecification.byKeywords(leaveApplication_fields, keywords);
+        Specification<User> user_spec = UserSpecification.byKeywords(user_fields, keywords);
+
+        List<LeaveApplication> leaveApplications = leaveApplicationRepository.findAll(leaveApplication_spec);
+        List<LeaveApplication> userleaveApplications = userRepository.findAll(user_spec).stream()
+                .filter(Employee.class::isInstance)
+                .map(Employee.class::cast)
+                .flatMap(employee -> Optional.ofNullable(employee.getLeaveApplications()).stream()
+                        .flatMap(Collection::stream)
+                    )
+                .distinct()
+                .toList();
+
+        leaveApplications = Stream.concat(leaveApplications.stream(), userleaveApplications.stream())
+                .distinct()
+                .toList();
+
+        return leaveApplications;
+    }
+    // Methods for handling leave leaveApplications
+
+
+    @Override
+    public Boolean saveApplication(LeaveApplication leaveApplication){
+        String status = leaveApplication.getStatus();
+        if(status.equals("Canceled") || status.equals("Deleted") || status.equals("Rejected") || status.equals("Approved")){
+            leaveApplicationRepository.save(leaveApplication);
+            return true;
+        }
+        String leaveType = leaveApplication.getType();
+        Employee employee = leaveApplication.getEmployee();
+        long totalDays = ChronoUnit.DAYS.between(leaveApplication.getStartDate(), leaveApplication.getEndDate()) + 1;
 
         UserLeaveEntitlement userLeaveEntitlement = employee.getUserLeaveEntitlement();
         if (totalDays <= 14) {
-            totalDays = publicHolidayService.holidayWeekendDuration(application.getStartDate(), application.getEndDate());
+            totalDays = publicHolidayService.holidayWeekendDuration(leaveApplication.getStartDate(), leaveApplication.getEndDate());
         }
         int annualEntitledDays = userLeaveEntitlement.getAnnualEntitledDays();
         int medicalEntitledDays = userLeaveEntitlement.getMedicalEntitledDays();
@@ -163,115 +236,37 @@ public class LeaveApplicationServiceImpl implements LeaveApplicationService{
             default:
                 throw new RuntimeException("Leave type not found");
         }
-        //approve application
-        application.setStatus("Approved");
+        boolean inContain = false;
 
-        Boolean isSave =  saveApplication(application);
-        if(isSave){
+        LocalDate startDate = leaveApplication.getStartDate();
+        List<LeaveApplication> appliedApplications = getAllAppliedApplications();
+        for(int i = 0; i < appliedApplications.size();i++){
+            if(!startDate.isAfter(appliedApplications.get(i).getEndDate()) || startDate.isEqual(appliedApplications.get(i).getEndDate())){
+                inContain = true;
+                break;
+            }
+        }
+        List<LeaveApplication> updatedApplications = getAllUpdatedApplications();
+        for(int i = 0; i < updatedApplications.size();i++){
+            if(!startDate.isAfter(updatedApplications.get(i).getEndDate()) || startDate.isEqual(updatedApplications.get(i).getEndDate())){
+                inContain = true;
+                break;
+            }
+        }
+        List<LeaveApplication> approvedApplications = getAllApprovedApplications();
+        for(int i = 0; i < approvedApplications.size();i++){
+            if(!startDate.isAfter(approvedApplications.get(i).getEndDate()) || startDate.isEqual(approvedApplications.get(i).getEndDate())){
+                inContain = true;
+                break;
+            }
+        }
+
+        if(!inContain){
+            leaveApplicationRepository.save(leaveApplication);
             userLeaveEntitlementService.save(userLeaveEntitlement);
             return true;
-        }else{
-            return false;
         }
-
-    }
-
-    @Override
-    public void rejectApplication(Long id) {
-        //check if application exists
-        leaveApplicationRepository.findById(id).orElseThrow(() -> new RuntimeException("Application not found"));
-        //check if application is already approved
-        LeaveApplication application = leaveApplicationRepository.findById(id).get();
-        if (application.getStatus().equals("Approved")) {
-            throw new RuntimeException("Application already approved");
-        }
-        //check if application is already rejected
-        if (application.getStatus().equals("Rejected")) {
-            throw new RuntimeException("Application already rejected");
-        }
-        //reject application
-        application.setStatus("Rejected");
-        leaveApplicationRepository.save(application);
-    }
-
-    @Override
-    public void addCommentToApplication(Long id, String comment) {
-        //check if application exists
-        leaveApplicationRepository.findById(id).orElseThrow(() -> new RuntimeException("Application not found"));
-        //add comment to application
-        LeaveApplication application = leaveApplicationRepository.findById(id).get();
-        application.setComment(comment);
-        leaveApplicationRepository.save(application);
-    }
-
-    @Override
-    public List<LeaveApplication> fuzzySearchApplication(String[] keywords) {
-        List<String> application_fields = Arrays.asList("type", "reason", "contactInfo");
-        List<String> user_fields = Arrays.asList("name", "email", "role");
-
-        Specification<LeaveApplication> application_spec = LeaveApplicationSpecification.byKeywords(application_fields, keywords);
-        Specification<User> user_spec = UserSpecification.byKeywords(user_fields, keywords);
-
-        List<LeaveApplication> applications = leaveApplicationRepository.findAll(application_spec);
-        List<LeaveApplication> userapplications = userRepository.findAll(user_spec).stream()
-                .filter(Employee.class::isInstance)
-                .map(Employee.class::cast)
-                .flatMap(employee -> Optional.ofNullable(employee.getLeaveApplications()).stream()
-                        .flatMap(Collection::stream)
-                    )
-                .distinct()
-                .toList();
-
-        applications = Stream.concat(applications.stream(), userapplications.stream())
-                .distinct()
-                .toList();
-
-        return applications;
-    }
-    // Methods for handling leave applications
-
-
-    @Override
-    public Boolean saveApplication(LeaveApplication leaveApplication){
-        if(leaveApplication.getStatus().equals("Applied") || leaveApplication.getStatus().equals("Approved") || leaveApplication.getStatus().equals("Updated")){
-            LocalDate startDate = leaveApplication.getStartDate();
-            boolean inContain = false;
-            List<LeaveApplication> appliedApplications = getAllAppliedApplications();
-            for(int i = 0; i < appliedApplications.size();i++){
-                if(!startDate.isAfter(appliedApplications.get(i).getEndDate()) || startDate.isEqual(appliedApplications.get(i).getEndDate())){
-                    inContain = true;
-                    break;
-                }
-            }
-            List<LeaveApplication> updatedApplications = getAllUpdatedApplications();
-            for(int i = 0; i < updatedApplications.size();i++){
-                if(!startDate.isAfter(updatedApplications.get(i).getEndDate()) || startDate.isEqual(updatedApplications.get(i).getEndDate())){
-                    inContain = true;
-                    break;
-                }
-            }
-            List<LeaveApplication> approvedApplications = getAllApprovedApplications();
-            for(int i = 0; i < approvedApplications.size();i++){
-                if(!startDate.isAfter(approvedApplications.get(i).getEndDate()) || startDate.isEqual(approvedApplications.get(i).getEndDate())){
-                    inContain = true;
-                    break;
-                }
-            }
-
-            if(!inContain){
-                leaveApplicationRepository.save(leaveApplication);
-                return true;
-            }
-
-            return false;
-        }else{
-            leaveApplicationRepository.save(leaveApplication);
-            return true;
-        }
-
-
-
-
+        return false;
     }
 
 

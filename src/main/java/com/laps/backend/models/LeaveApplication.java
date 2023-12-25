@@ -15,7 +15,6 @@ import java.time.LocalDate;
 @Entity
 public class LeaveApplication {
     @Id
-    @Setter(AccessLevel.NONE) // disable setter for id
     @GeneratedValue(strategy = GenerationType.AUTO)
     private Long id;
     @Column(nullable = false)
