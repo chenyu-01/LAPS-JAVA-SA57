@@ -128,10 +128,42 @@ LeaveEntitlement Controller
 
 ## Run Locally
 
-npm install
-```
+# Running the Java Application
 
-Start the server
+This guide provides step-by-step instructions on how to run the Java application on your system. Follow these steps to ensure a smooth setup and execution.
 
-  npm run start
-```
+## Prerequisites
+
+Before proceeding, ensure you have the following installed:
+- Java (JDK)
+- MySQL Server
+
+## Step 1: Modify `application.properties`
+
+First, you need to configure the database connection in the `application.properties` file. Follow these steps:
+
+1. Open the `application.properties` file located in the `src/main/resources` directory.
+2. Locate the following properties:
+spring.datasource.username=
+spring.datasource.password=
+3. Replace the above lines with your MySQL username and password. For example:
+spring.datasource.username=root
+spring.datasource.password=myPassword
+4. Ensure the `spring.datasource.url` property matches your local MySQL setup:
+spring.datasource.url=jdbc:mysql://localhost:3306/SA
+spring.datasource.url=jdbc:mysql://localhost:3306/SA
+./mvnw spring-boot:run
+Or, if you are using Windows:
+mvnw spring-boot:run
+
+The application should now start and be accessible. Ensure that the database server is running and accessible for the application to connect to.
+
+## Troubleshooting
+
+If you encounter any issues, check the following:
+
+- Ensure that MySQL server is running.
+- Verify that the database username and password in `application.properties` are correct.
+- Confirm that the `spring.datasource.url` in `application.properties` correctly points to your MySQL database.
+
+For further assistance, contact your system administrator or seek help from online forums.
