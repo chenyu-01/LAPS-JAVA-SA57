@@ -13,8 +13,10 @@ import com.laps.backend.repositories.UserRepository;
 import com.laps.backend.repositories.RoleRepository;
 import com.laps.backend.repositories.LeaveTypeRepository;
 import com.laps.backend.repositories.PublicHolidayRepository;
+import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.session.jdbc.config.annotation.web.http.EnableJdbcHttpSession;
 
+import javax.sql.DataSource;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.Date;
@@ -28,7 +30,7 @@ public class LapsBackendApplication {
 	}
 
 	@Bean
-	CommandLineRunner initDatabase(UserServiceImpl userService, RoleRepository rolerepository,
+	CommandLineRunner initDatabase(DataSource dataSource, UserServiceImpl userService, RoleRepository rolerepository,
 								   LeaveTypeRepository leaveTypeRepository, LeaveApplicationServiceImpl leaveApplicationService, PublicHolidayRepository publicHolidayRepository) {
 
 		return args -> {
