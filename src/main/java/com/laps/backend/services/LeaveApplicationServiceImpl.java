@@ -94,21 +94,6 @@ public class LeaveApplicationServiceImpl implements LeaveApplicationService{
         return leaveApplicationRepository.findByEmployee(employee);
     }
 
-    public Optional<List<LeaveApplication>> getApprovedApplicationByEmployee(Employee employee){
-        Long id = employee.getId();
-        return leaveApplicationRepository.findApprovedApplicationByEmployee(id);
-    }
-
-    public Optional<List<LeaveApplication>> getRejectedApplicationByEmployee(Employee employee){
-        Long id = employee.getId();
-        return leaveApplicationRepository.findApprovedApplicationByEmployee(id);
-    }
-
-    public Optional<List<LeaveApplication>> getCanceledApplicationByEmployee(Employee employee){
-        Long id = employee.getId();
-        return leaveApplicationRepository.findApprovedApplicationByEmployee(id);
-    }
-
     @Override
     public Boolean approveApplication(Long id) {
         //check if leaveApplication exists

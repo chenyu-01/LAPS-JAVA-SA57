@@ -183,13 +183,14 @@ public class LeaveApplicationController {
         }
         leaveApplicationBody.setStatus("Updated");
         leaveApplicationBody.setEmployee(prevApplication.getEmployee());
-        Boolean isSave =  leaveApplicationService.saveApplication(leaveApplicationBody);
-        if(isSave){
-            response.put("message", "Successfully Update Application");
+        try {
+            leaveApplicationService.saveApplication(leaveApplicationBody);
+            response.put("message", "Successfully Updated Application");
             return new ResponseEntity<>(response, HttpStatus.OK);
+        } catch (Exception e) {
+            response.put("message", e.getMessage());
+            return new ResponseEntity<>(response, HttpStatus.NOT_ACCEPTABLE);
         }
-        response.put("message", "Period conflict with other applications");
-        return new ResponseEntity<>(response, HttpStatus.NOT_ACCEPTABLE);
     }
 
     @PutMapping("/cancel/{id}")
@@ -247,9 +248,14 @@ public class LeaveApplicationController {
         }
         leaveApplicationBody.setStatus("Applied");
         leaveApplicationBody.setEmployee(optEmployee.get());
-        leaveApplicationService.saveApplication(leaveApplicationBody);
-        response.put("message", "Successfully Submitted Application");
-        return new ResponseEntity<>(response, HttpStatus.OK);
+        try {
+            leaveApplicationService.saveApplication(leaveApplicationBody);
+            response.put("message", "Successfully Submitted Application");
+            return new ResponseEntity<>(response, HttpStatus.OK);
+        } catch (Exception e) {
+            response.put("message", e.getMessage());
+            return new ResponseEntity<>(response, HttpStatus.NOT_ACCEPTABLE);
+        }
     }
 
     @PostMapping("/query/{id}")
