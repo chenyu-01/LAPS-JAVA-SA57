@@ -233,7 +233,7 @@ public class LeaveApplicationController {
         }
         // if no manager, return BAD_REQUEST
         if (optEmployee.get().getManager() == null) {
-            response.put("message", "This employee has no manager");
+            response.put("message", "You don't have your manager");
             return new ResponseEntity<>(response, HttpStatus.BAD_REQUEST);
         }
         leaveApplicationBody.setStatus("Applied");
@@ -243,7 +243,7 @@ public class LeaveApplicationController {
             response.put("message", "Successfully Submitted Application");
             return new ResponseEntity<>(response, HttpStatus.OK);
         } catch (RuntimeException e) {
-            response.put("error", e.getMessage());
+            response.put("message", e.getMessage());
             return new ResponseEntity<>(response, HttpStatus.NOT_ACCEPTABLE);
         }
     }
