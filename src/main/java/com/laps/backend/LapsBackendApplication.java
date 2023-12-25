@@ -74,29 +74,6 @@ public class LapsBackendApplication {
 			List<Employee> employees = List.of((Employee) user2, (Employee) user3);
 			((Manager) user1).setSubordinates(employees);
 			userService.save(user1);
-			for (int i = 0; i < 5; i++){
-				LeaveApplication leaveApplication1 = new LeaveApplication();
-				leaveApplication1.setEmployee((Employee) user2);
-				leaveApplication1.setStartDate(LocalDate.now().plusDays(i*2));
-				leaveApplication1.setEndDate(LocalDate.now().plusDays(2*i+1));
-				leaveApplication1.setReason("Sick");
-				leaveApplication1.setStatus("Applied");
-				leaveApplication1.setType("Annual");
-				leaveApplication1.setIsOverseas(false);
-				leaveApplicationService.saveApplication(leaveApplication1);
-			}
-
-			for (int i = 0 ; i < 5; i++){
-				LeaveApplication leaveApplication2 = new LeaveApplication();
-				leaveApplication2.setEmployee((Employee) user3);
-				leaveApplication2.setStartDate(LocalDate.now().plusDays(10+i*2));
-				leaveApplication2.setEndDate(LocalDate.now().plusDays(11+i*2));
-				leaveApplication2.setReason("Sick");
-				leaveApplication2.setStatus("Approved");
-				leaveApplication2.setType("Annual");
-				leaveApplication2.setIsOverseas(false);
-				leaveApplicationService.saveApplication(leaveApplication2);
-			}
 
 
 			User user4 = new Admin();
