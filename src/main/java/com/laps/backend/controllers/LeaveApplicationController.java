@@ -187,7 +187,7 @@ public class LeaveApplicationController {
             leaveApplicationService.saveApplication(leaveApplicationBody);
             response.put("message", "Successfully Updated Application");
             return new ResponseEntity<>(response, HttpStatus.OK);
-        } catch (Exception e) {
+        } catch (RuntimeException e) {
             response.put("message", e.getMessage());
             return new ResponseEntity<>(response, HttpStatus.NOT_ACCEPTABLE);
         }
@@ -252,8 +252,8 @@ public class LeaveApplicationController {
             leaveApplicationService.saveApplication(leaveApplicationBody);
             response.put("message", "Successfully Submitted Application");
             return new ResponseEntity<>(response, HttpStatus.OK);
-        } catch (Exception e) {
-            response.put("message", e.getMessage());
+        } catch (RuntimeException e) {
+            response.put("error", e.getMessage());
             return new ResponseEntity<>(response, HttpStatus.NOT_ACCEPTABLE);
         }
     }

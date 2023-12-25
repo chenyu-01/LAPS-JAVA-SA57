@@ -36,9 +36,6 @@ public class LeaveApplicationServiceImpl implements LeaveApplicationService{
     }
 
 
-    public List<LeaveApplication> getAllApplications() {
-        return leaveApplicationRepository.findAll();
-    }
 
     public Optional<List<LeaveApplication>> getEmployeeAllApplications(Employee employee){
         Long id = employee.getId();
@@ -116,18 +113,13 @@ public class LeaveApplicationServiceImpl implements LeaveApplicationService{
         leaveApplication.setStatus("Approved");
 
         Boolean isSave =  saveApplication(leaveApplication);
-        if(isSave){
-
-            return true;
-        }
-        return false;
+        return isSave;
     }
 
     @Override
     public void rejectApplication(Long id) {
         //check if leaveApplication exists
         leaveApplicationRepository.findById(id).orElseThrow(() -> new RuntimeException("Application not found"));
-        //check if leaveApplication is already approved
         LeaveApplication leaveApplication = leaveApplicationRepository.findById(id).get();
         if (leaveApplication.getStatus().equals("Approved")) {
             throw new RuntimeException("Application already approved");
@@ -224,25 +216,23 @@ public class LeaveApplicationServiceImpl implements LeaveApplicationService{
         boolean inContain = false;
 
         LocalDate startDate = leaveApplication.getStartDate();
+        LocalDate endDate = leaveApplication.getEndDate();
         List<LeaveApplication> appliedApplications = getAllAppliedApplications();
         for(int i = 0; i < appliedApplications.size();i++){
-            if(!startDate.isAfter(appliedApplications.get(i).getEndDate()) || startDate.isEqual(appliedApplications.get(i).getEndDate())){
-                inContain = true;
-                break;
+            if(startDate.isBefore(appliedApplications.get(i).getEndDate()) || endDate.isAfter(appliedApplications.get(i).getStartDate())){
+                throw new RuntimeException("Leave application date conflict");
             }
         }
         List<LeaveApplication> updatedApplications = getAllUpdatedApplications();
         for(int i = 0; i < updatedApplications.size();i++){
-            if(!startDate.isAfter(updatedApplications.get(i).getEndDate()) || startDate.isEqual(updatedApplications.get(i).getEndDate())){
-                inContain = true;
-                break;
+            if(startDate.isBefore(updatedApplications.get(i).getEndDate()) || endDate.isAfter(updatedApplications.get(i).getStartDate())){
+                throw new RuntimeException("Leave application date conflict");
             }
         }
         List<LeaveApplication> approvedApplications = getAllApprovedApplications();
         for(int i = 0; i < approvedApplications.size();i++){
-            if(!startDate.isAfter(approvedApplications.get(i).getEndDate()) || startDate.isEqual(approvedApplications.get(i).getEndDate())){
-                inContain = true;
-                break;
+            if(startDate.isBefore(approvedApplications.get(i).getEndDate()) || endDate.isAfter(approvedApplications.get(i).getStartDate())){
+                throw new RuntimeException("Leave application date conflict");
             }
         }
 
