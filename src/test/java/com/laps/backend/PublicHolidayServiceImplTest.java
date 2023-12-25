@@ -55,7 +55,15 @@ class PublicHolidayServiceImplTest {
         LocalDate startDate = LocalDate.of(2023, 12, 23); // Saturday
         LocalDate endDate = LocalDate.of(2023, 12, 26);   // Public holiday
         long duration = publicHolidayService.holidayWeekendDuration(startDate, endDate);
-        assertEquals(1, duration, "Duration should be 0 for weekends and holidays");
+        assertEquals(1, duration, "Duration should be 1 for weekends and holidays");
+    }
+
+    @Test
+    void testNoWeekendsHolidays() {
+        LocalDate startDate = LocalDate.of(2023, 12, 26); // Sunday
+        LocalDate endDate = LocalDate.of(2023, 12, 28);   // Public holiday
+        long duration = publicHolidayService.holidayWeekendDuration(startDate, endDate);
+        assertEquals(3, duration, "Duration should be 3 days");
     }
 
     // Add other test methods for each scenario here

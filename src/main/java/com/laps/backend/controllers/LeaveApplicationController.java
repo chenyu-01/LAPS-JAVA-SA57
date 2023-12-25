@@ -197,8 +197,6 @@ public class LeaveApplicationController {
             float prevCompensation = userLeaveEntitlement.getCompensationEntitledDays() + entitlementSubtraction;
             userLeaveEntitlement.setCompensationEntitledDays(prevCompensation);
         }
-        // save to database
-        userLeaveEntitlementService.save(userLeaveEntitlement);
     }
 
     @PutMapping("/cancel/{id}")

@@ -57,13 +57,14 @@ public class PublicHolidayServiceImpl implements PublicHolidayService{
 
 	public long holidayWeekendDuration(LocalDate startDate, LocalDate endDate){
 		List<PublicHolidays> publicHolidays = publicHolidayRepository.findAll();
-		long totalDays = ChronoUnit.DAYS.between(startDate, endDate);
+		long totalDays = ChronoUnit.DAYS.between(startDate, endDate) + 1;
 
 		// calculate the duration of public holidays and weekends between startDate and endDate
-		while (startDate.isBefore(endDate)) {
+		while (startDate.isBefore(endDate.plusDays(1))) {
+			boolean isweekdays = startDate.getDayOfWeek().getValue() == 6 || startDate.getDayOfWeek().getValue() == 7;
 			for (PublicHolidays publicHoliday : publicHolidays) {
 				// if startDate is a public holiday and also a weekend, avoid counting twice
-				if (startDate.getDayOfWeek().getValue() != 6 && startDate.getDayOfWeek().getValue() != 7) {
+				if (isweekdays) {
 					break;
 				}
 				if (startDate.equals(publicHoliday.getDate())) {
@@ -71,7 +72,7 @@ public class PublicHolidayServiceImpl implements PublicHolidayService{
 					break;
 				}
 			}
-			if (startDate.getDayOfWeek().getValue() == 6 || startDate.getDayOfWeek().getValue() == 7) {
+			if (isweekdays) {
 				totalDays -= 1;
 			}
 			startDate = startDate.plusDays(1);
