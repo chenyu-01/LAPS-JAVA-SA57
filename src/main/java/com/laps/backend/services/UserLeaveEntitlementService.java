@@ -6,5 +6,5 @@ import com.laps.backend.models.UserLeaveEntitlement;
 public interface UserLeaveEntitlementService {
     UserLeaveEntitlement findByUserId(Long userId);
 
-    void save(UserLeaveEntitlement newEntitlement);
+    UserLeaveEntitlement save(UserLeaveEntitlement newEntitlement);
 }
