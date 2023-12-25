@@ -16,7 +16,6 @@ import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.WebDataBinder;
 import org.springframework.web.bind.annotation.*;
 
-import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
@@ -139,19 +138,19 @@ public class LeaveApplicationController {
     public ResponseEntity<?> findEmployeeApplication(@PathVariable("id") Long id){
         Optional<Employee> optEmployee = employeeService.findById(id);
         if (optEmployee.isEmpty()) {
-            return new ResponseEntity<String>("Employee Not Found",HttpStatus.NOT_FOUND);
+            return new ResponseEntity<>("Employee Not Found",HttpStatus.NOT_FOUND);
         }
         Employee employee = optEmployee.get();
         Optional<List<LeaveApplication>> optLeaveApplications = leaveApplicationService.getEmployeeAllApplications(employee);
         if (optLeaveApplications.isEmpty()){
-            return new ResponseEntity<String>("No Leave Application Found",HttpStatus.NOT_FOUND);
+            return new ResponseEntity<>("No Leave Application Found",HttpStatus.NOT_FOUND);
         }
         List<LeaveApplication> leaveApplications = optLeaveApplications.get();
         List<LeaveApplicationDTO>  leaveApplicationDTOS = new ArrayList<>();
         // filter out deleted applications
         leaveApplications.stream().filter(application -> !application.getStatus().equals("Deleted")).
                 forEach(application ->  leaveApplicationDTOS.add(new LeaveApplicationDTO(application)));
-        return new ResponseEntity<List<LeaveApplicationDTO>>(leaveApplicationDTOS,HttpStatus.OK);
+        return new ResponseEntity<>(leaveApplicationDTOS,HttpStatus.OK);
     }
 
     @PutMapping("/update")
@@ -195,27 +194,27 @@ public class LeaveApplicationController {
                 }
                 leaveApplication.setStatus("Cancelled");
                 leaveApplicationService.saveApplication(leaveApplication);
-                return new  ResponseEntity<String>("Cancelled Application", HttpStatus.OK);
+                return new  ResponseEntity<>("Cancelled Application", HttpStatus.OK);
 
             }
-            return new ResponseEntity<String>("Application Not Found" ,HttpStatus.NOT_FOUND);
+            return new ResponseEntity<>("Application Not Found" ,HttpStatus.NOT_FOUND);
     }
 
 
     @DeleteMapping("/delete/{id}")
         public ResponseEntity<String> deleteEmployeeApplication(@PathVariable("id") Long leaveId) {
             Optional<LeaveApplication> optleaveApplication = leaveApplicationService.findById(leaveId);
-            if (!optleaveApplication.isPresent()) {
-                return new ResponseEntity<String>("Application Not Found", HttpStatus.NOT_FOUND);
+            if (optleaveApplication.isEmpty()) {
+                return new ResponseEntity<>("Application Not Found", HttpStatus.NOT_FOUND);
             }
             String status = optleaveApplication.get().getStatus();
             if (status.equals(("Approved")) || status.equals("Rejected")) {
-                return new ResponseEntity<String>("Cannot Delete Application that is Approved Or Rejected", HttpStatus.NOT_ACCEPTABLE);
+                return new ResponseEntity<>("Cannot Delete Application that is Approved Or Rejected", HttpStatus.NOT_ACCEPTABLE);
             }
             LeaveApplication leaveApplication = optleaveApplication.get();
             leaveApplication.setStatus("Deleted");
             leaveApplicationService.saveApplication(leaveApplication);
-            return new ResponseEntity<String>("Application Successfully Deleted", HttpStatus.OK);
+            return new ResponseEntity<>("Application Successfully Deleted", HttpStatus.OK);
 
     }
 
@@ -251,7 +250,7 @@ public class LeaveApplicationController {
     }
 
     @PostMapping("/query/{id}")
-    public ResponseEntity<List<LeaveApplicationDTO>> queryEmployeeApplication(@PathVariable("id") Long id,@RequestBody String query) throws ParseException {
+    public ResponseEntity<List<LeaveApplicationDTO>> queryEmployeeApplication(@PathVariable("id") Long id,@RequestBody String query) {
        Optional<Manager> optManager = Optional.ofNullable(userService.findManagerById(id));
          if (optManager.isEmpty()) {
           return ResponseEntity.noContent().build(); // 204 No Content
