@@ -1,5 +1,6 @@
 package com.laps.backend.services;
 
+import java.time.LocalDate;
 import java.util.List;
 import java.util.Optional;
 
@@ -12,6 +13,7 @@ import org.springframework.transaction.annotation.Transactional;
 public interface PublicHolidayService {
 
 	List<PublicHolidays> getAllPublicHolidays();
+	long holidayWeekendDuration(LocalDate startDate, LocalDate endDate);
 
 	@Transactional
 	PublicHolidays createpublicHolidays(PublicHolidays publicHolidays);
