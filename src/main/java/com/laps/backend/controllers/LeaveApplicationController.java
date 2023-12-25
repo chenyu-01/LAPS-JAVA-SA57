@@ -19,7 +19,6 @@ import org.springframework.web.bind.annotation.*;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
-import java.text.ParseException;
 import java.util.*;
 import java.util.stream.Collectors;
 
@@ -55,7 +54,7 @@ public class LeaveApplicationController {
         }
 
         List<LeaveApplicationDTO> applicationDTOS = new ArrayList<>();
-        applications.stream().forEach(application -> applicationDTOS.add(new LeaveApplicationDTO(application)));
+        applications.forEach(application -> applicationDTOS.add(new LeaveApplicationDTO(application)));
         return ResponseEntity.ok(applicationDTOS);
     }
 
