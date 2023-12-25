@@ -4,13 +4,9 @@ import com.laps.backend.models.*;
 import com.laps.backend.models.Employee;
 import com.laps.backend.models.LeaveApplication;
 import com.laps.backend.models.LeaveApplicationDTO;
-import com.laps.backend.repositories.EmployeeReposity;
-import com.laps.backend.services.EmployeeService;
-import com.laps.backend.services.EmployeeServiceImpl;
 import com.laps.backend.services.EmployeeService;
 import com.laps.backend.services.LeaveApplicationService;
 import com.laps.backend.services.UserService;
-import com.laps.backend.services.LeaveApplicationServiceImpl;
 import com.laps.backend.validators.LeaveApplicationValidator;
 import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -20,13 +16,10 @@ import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.WebDataBinder;
 import org.springframework.web.bind.annotation.*;
 
-import java.text.SimpleDateFormat;
-import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
-import java.text.DateFormat;
 import java.text.ParseException;
 import java.util.*;
 import java.util.stream.Collectors;
@@ -38,7 +31,6 @@ public class LeaveApplicationController {
     private  final UserService userService;
     private final LeaveApplicationService leaveApplicationService;
     private final EmployeeService employeeService;
-    private final DateTimeFormatter df = DateTimeFormatter.ofPattern("yyyy-MM-dd'T'HH:mm");
 
     @Autowired
     private LeaveApplicationValidator leaveApplicationValidator;
@@ -136,7 +128,7 @@ public class LeaveApplicationController {
     @GetMapping("/get/{id}")
     public ResponseEntity<LeaveApplicationDTO> getApplicationById(@PathVariable("id") Long id) {
         Optional<LeaveApplication> application = leaveApplicationService.findById(id);
-        if (application == null) {
+        if (application.isEmpty()) {
             return ResponseEntity.notFound().build(); // 404
         }
         LeaveApplicationDTO applicationDTO = new LeaveApplicationDTO(application.get());
@@ -146,12 +138,12 @@ public class LeaveApplicationController {
     @GetMapping("/findemployee/{id}")
     public ResponseEntity<?> findEmployeeApplication(@PathVariable("id") Long id){
         Optional<Employee> optEmployee = employeeService.findById(id);
-        if (!optEmployee.isPresent()) {
+        if (optEmployee.isEmpty()) {
             return new ResponseEntity<String>("Employee Not Found",HttpStatus.NOT_FOUND);
         }
         Employee employee = optEmployee.get();
         Optional<List<LeaveApplication>> optLeaveApplications = leaveApplicationService.getEmployeeAllApplications(employee);
-        if (!optLeaveApplications.isPresent()){
+        if (optLeaveApplications.isEmpty()){
             return new ResponseEntity<String>("No Leave Application Found",HttpStatus.NOT_FOUND);
         }
         List<LeaveApplication> leaveApplications = optLeaveApplications.get();
@@ -171,7 +163,7 @@ public class LeaveApplicationController {
         }
         Long leaveId = leaveApplicationBody.getId();
         Optional<LeaveApplication> optleaveApplication = leaveApplicationService.findById(leaveId);
-        if(!optleaveApplication.isPresent()) {
+        if(optleaveApplication.isEmpty()) {
             response.put("message", "Requested Leave Application Not Found");
             return new ResponseEntity<>(response, HttpStatus.NOT_FOUND);
         }
@@ -237,7 +229,7 @@ public class LeaveApplicationController {
             return new ResponseEntity<>(response, HttpStatus.BAD_REQUEST);
         }
         Optional<Employee> optEmployee = employeeService.findById(inid);
-        if(!optEmployee.isPresent()){
+        if(optEmployee.isEmpty()){
             response.put("message", "Employee Not Found");
             return new ResponseEntity<>(response,HttpStatus.NOT_FOUND);
         }

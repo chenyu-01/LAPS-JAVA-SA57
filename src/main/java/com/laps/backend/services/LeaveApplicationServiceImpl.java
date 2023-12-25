@@ -112,15 +112,13 @@ public class LeaveApplicationServiceImpl implements LeaveApplicationService{
         //approve leaveApplication
         leaveApplication.setStatus("Approved");
 
-        Boolean isSave =  saveApplication(leaveApplication);
-        return isSave;
+        return saveApplication(leaveApplication);
     }
 
     @Override
     public void rejectApplication(Long id) {
         //check if leaveApplication exists
-        leaveApplicationRepository.findById(id).orElseThrow(() -> new RuntimeException("Application not found"));
-        LeaveApplication leaveApplication = leaveApplicationRepository.findById(id).get();
+        LeaveApplication leaveApplication= leaveApplicationRepository.findById(id).orElseThrow(() -> new RuntimeException("Application not found"));
         if (leaveApplication.getStatus().equals("Approved")) {
             throw new RuntimeException("Application already approved");
         }
@@ -136,9 +134,8 @@ public class LeaveApplicationServiceImpl implements LeaveApplicationService{
     @Override
     public void addCommentToApplication(Long id, String comment) {
         //check if leaveApplication exists
-        leaveApplicationRepository.findById(id).orElseThrow(() -> new RuntimeException("Application not found"));
+        LeaveApplication leaveApplication = leaveApplicationRepository.findById(id).orElseThrow(() -> new RuntimeException("Application not found"));
         //add comment to leaveApplication
-        LeaveApplication leaveApplication = leaveApplicationRepository.findById(id).get();
         leaveApplication.setComment(comment);
         leaveApplicationRepository.save(leaveApplication);
     }
@@ -193,14 +190,14 @@ public class LeaveApplicationServiceImpl implements LeaveApplicationService{
                 if (annualEntitledDays < totalDays) {
                     throw new RuntimeException("Annual leave entitlement not enough");
                 }
-                annualEntitledDays -= totalDays;
+                annualEntitledDays -= (int) totalDays;
                 userLeaveEntitlement.setAnnualEntitledDays(annualEntitledDays);
                 break;
             case "Medical":
                 if (medicalEntitledDays < totalDays) {
                     throw new RuntimeException("Medical leave entitlement not enough");
                 }
-                medicalEntitledDays -= totalDays;
+                medicalEntitledDays -= (int) totalDays;
                 userLeaveEntitlement.setMedicalEntitledDays(medicalEntitledDays);
                 break;
             case "Compensation":
@@ -218,20 +215,20 @@ public class LeaveApplicationServiceImpl implements LeaveApplicationService{
         LocalDate startDate = leaveApplication.getStartDate();
         LocalDate endDate = leaveApplication.getEndDate();
         List<LeaveApplication> appliedApplications = getAllAppliedApplications();
-        for(int i = 0; i < appliedApplications.size();i++){
-            if(startDate.isBefore(appliedApplications.get(i).getEndDate()) || endDate.isAfter(appliedApplications.get(i).getStartDate())){
+        for (LeaveApplication appliedApplication : appliedApplications) {
+            if (startDate.isBefore(appliedApplication.getEndDate()) || endDate.isAfter(appliedApplication.getStartDate())) {
                 throw new RuntimeException("Leave application date conflict");
             }
         }
         List<LeaveApplication> updatedApplications = getAllUpdatedApplications();
-        for(int i = 0; i < updatedApplications.size();i++){
-            if(startDate.isBefore(updatedApplications.get(i).getEndDate()) || endDate.isAfter(updatedApplications.get(i).getStartDate())){
+        for (LeaveApplication updatedApplication : updatedApplications) {
+            if (startDate.isBefore(updatedApplication.getEndDate()) || endDate.isAfter(updatedApplication.getStartDate())) {
                 throw new RuntimeException("Leave application date conflict");
             }
         }
         List<LeaveApplication> approvedApplications = getAllApprovedApplications();
-        for(int i = 0; i < approvedApplications.size();i++){
-            if(startDate.isBefore(approvedApplications.get(i).getEndDate()) || endDate.isAfter(approvedApplications.get(i).getStartDate())){
+        for (LeaveApplication approvedApplication : approvedApplications) {
+            if (startDate.isBefore(approvedApplication.getEndDate()) || endDate.isAfter(approvedApplication.getStartDate())) {
                 throw new RuntimeException("Leave application date conflict");
             }
         }
