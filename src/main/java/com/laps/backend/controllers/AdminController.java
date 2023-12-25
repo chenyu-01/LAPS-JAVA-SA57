@@ -131,7 +131,14 @@ private final AdminServiceImpl adminService;
 
         switch (newUser.getRole()) {
             case "Manager" -> {
-                newUser = adminService.createManager(newUser);
+                String manager_name = (String) userData.get("authName");
+                Manager manager = adminService.getManagerByName(manager_name);
+
+                if (manager == null) {
+                    newUser = adminService.createManager(newUser);
+                }else {
+                    newUser = adminService.createManager(newUser, manager);
+                }
             }
             case "Employee" -> {
                 String manager_name = (String) userData.get("authName");

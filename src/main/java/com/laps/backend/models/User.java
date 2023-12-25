@@ -33,7 +33,7 @@ public class User {
     @Column(nullable = false)
     private String password;
 
-    @OneToOne
+    @OneToOne(cascade = CascadeType.REMOVE)
     @JoinColumn(name = "userEntitlementId")
     private UserLeaveEntitlement userLeaveEntitlement;
 

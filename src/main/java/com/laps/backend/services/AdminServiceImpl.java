@@ -163,4 +163,13 @@ public class AdminServiceImpl implements AdminService {
 
         return userRepository.findAll(spec);
     }
+
+    public User createManager(User newUser, Manager manager) {
+        if (userRepository.existsByEmail(newUser.getEmail())) {
+            throw new IllegalArgumentException("User with email " + newUser.getEmail() + " already exists");
+        }
+        Manager newmanager = new Manager(newUser);
+        newmanager.setManager(manager);
+        return managerRepository.save(newmanager);
+    }
 }
