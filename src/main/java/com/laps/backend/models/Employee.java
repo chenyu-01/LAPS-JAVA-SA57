@@ -14,7 +14,6 @@ public class Employee extends User{
 
     @ManyToOne
     @JoinColumn(name = "manager_id")
-    @JsonManagedReference
     private Manager manager; // explicitly set manager_id foreign key column in employee table
     @OneToMany(mappedBy = "employee",cascade = CascadeType.REMOVE)
     private List<LeaveApplication> leaveApplications;

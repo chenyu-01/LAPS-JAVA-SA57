@@ -15,7 +15,6 @@ import java.util.List;
 public class Manager extends Employee{
 
     @OneToMany(mappedBy = "manager")
-    @JsonBackReference
     private List<Employee> subordinates;
 
     public Manager(Employee employee) {
