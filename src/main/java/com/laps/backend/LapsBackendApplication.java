@@ -28,7 +28,7 @@ public class LapsBackendApplication {
 
 	@Bean
 	CommandLineRunner initDatabase(UserServiceImpl userService, RoleRepository rolerepository,
-								   LeaveTypeRepository leaveTypeRepository, LeaveApplicationServiceImpl leaveRepository, PublicHolidayRepository publicHolidayRepository) {
+								   LeaveTypeRepository leaveTypeRepository, LeaveApplicationServiceImpl leaveApplicationService, PublicHolidayRepository publicHolidayRepository) {
 
 		return args -> {
 
@@ -83,7 +83,7 @@ public class LapsBackendApplication {
 				leaveApplication1.setStatus("Applied");
 				leaveApplication1.setType("Annual");
 				leaveApplication1.setIsOverseas(false);
-				leaveRepository.saveApplication(leaveApplication1);
+				leaveApplicationService.saveApplication(leaveApplication1);
 			}
 
 			for (int i = 0 ; i < 5; i++){
@@ -95,7 +95,7 @@ public class LapsBackendApplication {
 				leaveApplication2.setStatus("Approved");
 				leaveApplication2.setType("Annual");
 				leaveApplication2.setIsOverseas(false);
-				leaveRepository.saveApplication(leaveApplication2);
+				leaveApplicationService.saveApplication(leaveApplication2);
 			}
 
 
