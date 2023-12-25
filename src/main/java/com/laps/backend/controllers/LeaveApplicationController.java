@@ -163,7 +163,7 @@ public class LeaveApplicationController {
     }
 
     @PutMapping("/update")
-    public ResponseEntity<?> updateEmployeeApplication(@ModelAttribute("leaveApplicationBinder") @RequestBody @Valid LeaveApplication leaveApplicationBody, BindingResult result) {
+    public ResponseEntity<?> updateEmployeeApplication(@RequestBody @Valid LeaveApplication leaveApplicationBody, BindingResult result) {
         Map<String , Object> response = new HashMap<>();
         if (result.hasErrors()) {
             // Handle validation errors
@@ -227,7 +227,7 @@ public class LeaveApplicationController {
     }
 
     @PostMapping("/submit/{id}")
-    public ResponseEntity<?> submitEmployeeApplication(@PathVariable("id") Long inid,@ModelAttribute("leaveApplicationBinder") @RequestBody @Valid LeaveApplication leaveApplicationBody, BindingResult result) {
+    public ResponseEntity<?> submitEmployeeApplication(@PathVariable("id") Long inid, @RequestBody @Valid LeaveApplication leaveApplicationBody, BindingResult result) {
         Map<String, Object> response = new HashMap<>();
         if (result.hasErrors()) {
             // Handle validation errors

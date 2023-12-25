@@ -1,5 +1,6 @@
 package com.laps.backend.controllers;
 
+import com.fasterxml.jackson.annotation.JsonManagedReference;
 import com.laps.backend.models.User;
 import com.laps.backend.models.UserDTO;
 import com.laps.backend.services.UserServiceImpl;

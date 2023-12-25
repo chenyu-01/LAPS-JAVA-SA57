@@ -1,5 +1,6 @@
 package com.laps.backend.models;
 
+import com.fasterxml.jackson.annotation.JsonBackReference;
 import jakarta.persistence.Entity;
 import jakarta.persistence.JoinColumn;
 import jakarta.persistence.ManyToOne;
@@ -14,6 +15,7 @@ import java.util.List;
 public class Manager extends Employee{
 
     @OneToMany(mappedBy = "manager")
+    @JsonBackReference
     private List<Employee> subordinates;
 
     public Manager(Employee employee) {
