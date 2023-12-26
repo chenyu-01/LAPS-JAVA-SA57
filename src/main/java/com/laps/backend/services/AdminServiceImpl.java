@@ -10,7 +10,6 @@ import com.laps.backend.repositories.UserRepository;
 import com.laps.backend.specification.UserSpecification;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.jpa.domain.Specification;
-import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 
 import java.util.*;
@@ -150,10 +149,20 @@ public class AdminServiceImpl implements AdminService {
 
     }
 
-    public User updateUser(User user) {
+    public void updateUser(User user) {
         if (user instanceof Employee)
-            return employeeRepository.save((Employee) user);
-        else return userRepository.save(user);
+        {
+            //modify origin manager's subordinates
+            Manager originManager = ((Employee) user).getManager();
+            if (originManager != null) {
+                originManager.getSubordinates().remove(user);
+                managerRepository.save(originManager);
+            }
+            employeeRepository.save((Employee) user);
+        }
+        else {
+            userRepository.save(user);
+        }
     }
 
     @Override
