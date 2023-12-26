@@ -1,10 +1,8 @@
 package com.laps.backend.services;
 
-import com.laps.backend.models.Admin;
-import com.laps.backend.models.Employee;
-import com.laps.backend.models.Manager;
-import com.laps.backend.models.User;
+import com.laps.backend.models.*;
 import com.laps.backend.repositories.EmployeeReposity;
+import com.laps.backend.repositories.LeaveTypeRepository;
 import com.laps.backend.repositories.ManagerRepository;
 import com.laps.backend.repositories.UserRepository;
 import com.laps.backend.specification.UserSpecification;
@@ -25,6 +23,10 @@ public class AdminServiceImpl implements AdminService {
     @Autowired
     private EmployeeReposity employeeRepository;
 
+    @Autowired
+    private LeaveTypeRepository leaveTypeRepository;
+    @Autowired
+    private UserLeaveEntitlementServiceImpl userLeaveEntitlementRepository;
     @Override
     public List<User> getAllUsers() {
         return userRepository.findAll();
@@ -96,7 +98,9 @@ public class AdminServiceImpl implements AdminService {
         if (userRepository.existsByEmail(newUser.getEmail())) {
             throw new IllegalArgumentException("User with email " + newUser.getEmail() + " already exists");
         }
-        return userRepository.save(newUser);
+        userRepository.save(newUser);
+        setEntitlement(newUser);
+        return newUser;
     }
 
     @Override
@@ -105,7 +109,9 @@ public class AdminServiceImpl implements AdminService {
             throw new IllegalArgumentException("User with email " + newUser.getEmail() + " already exists");
         }
         Admin admin = new Admin(newUser);
-        return userRepository.save(admin);
+        userRepository.save(admin);
+        setEntitlement(admin);
+        return admin;
     }
 
     public Manager getManagerByName(String managerName) {
@@ -119,7 +125,9 @@ public class AdminServiceImpl implements AdminService {
         }
         Employee employee = new Employee(newUser);
         employee.setManager(manager);
-        return employeeRepository.save(employee);
+        employeeRepository.save(employee);
+        setEntitlement(employee);
+        return employee;
     }
 
     @Override
@@ -128,7 +136,9 @@ public class AdminServiceImpl implements AdminService {
             throw new IllegalArgumentException("User with email " + newUser.getEmail() + " already exists");
         }
         Employee employee = new Employee(newUser);
-        return employeeRepository.save(employee);
+        employeeRepository.save(employee);
+        setEntitlement(employee);
+        return employee;
     }
 
     @Override
@@ -137,7 +147,9 @@ public class AdminServiceImpl implements AdminService {
             throw new IllegalArgumentException("User with email " + newUser.getEmail() + " already exists");
         }
         Manager manager = new Manager(newUser);
-        return managerRepository.save(manager);
+        managerRepository.save(manager);
+        setEntitlement(manager);
+        return manager;
     }
 
     public User getManagerByEmployee(Long id) {
@@ -179,6 +191,28 @@ public class AdminServiceImpl implements AdminService {
         }
         Manager newmanager = new Manager(newUser);
         newmanager.setManager(manager);
-        return managerRepository.save(newmanager);
+        managerRepository.save(newmanager);
+        setEntitlement(newmanager);
+        return newmanager;
+    }
+
+    private <T> void setEntitlement(T newUser) {
+        UserLeaveEntitlement userLeaveEntitlement = new UserLeaveEntitlement();
+        userLeaveEntitlement.setUser((User) newUser);
+        String userRole = ((User) newUser).getRole() == "User" ? "Employee" : ((User) newUser).getRole();
+        leaveTypeRepository.findAll().stream().filter(leaveType ->
+                        leaveType.getRoleName().equals(userRole))
+                .forEach(leaveType -> {
+                    int entitledDays = leaveType.getEntitledNum();
+                    if(leaveType.getName().equals(LeaveTypeEnum.ANNUAL)){
+                        userLeaveEntitlement.setAnnualEntitledDays(entitledDays);
+                    } else if(leaveType.getName().equals(LeaveTypeEnum.MEDICAL)){
+                        userLeaveEntitlement.setMedicalEntitledDays(entitledDays);
+                    } else if(leaveType.getName().equals(LeaveTypeEnum.COMPENSATION)){
+                        userLeaveEntitlement.setCompensationEntitledDays(entitledDays);
+                    }
+                });
+        userLeaveEntitlementRepository.save(userLeaveEntitlement);
+        ((User) newUser).setUserLeaveEntitlement(userLeaveEntitlement);
     }
 }
