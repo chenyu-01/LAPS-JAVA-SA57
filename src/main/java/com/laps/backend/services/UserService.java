@@ -11,7 +11,7 @@ import org.springframework.stereotype.Service;
 public interface UserService {
     // Methods for handling users
     User findByEmail(String username);
-    void save(User user);
+    User save(User user);
 
     //list all employees belong to a manager
     List<Employee> findAllEmployeeByManager(Manager manager);
