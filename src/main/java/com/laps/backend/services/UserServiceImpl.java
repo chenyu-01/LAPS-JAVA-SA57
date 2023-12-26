@@ -3,15 +3,12 @@ package com.laps.backend.services;
 import com.laps.backend.models.*;
 import com.laps.backend.repositories.LeaveTypeRepository;
 import com.laps.backend.repositories.ManagerRepository;
-import com.laps.backend.repositories.UserLeaveEntitlementRepository;
 import com.laps.backend.repositories.UserRepository;
-import com.laps.backend.specification.UserSpecification;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.data.jpa.domain.Specification;
 import org.springframework.stereotype.Service;
 
-import java.util.Arrays;
 import java.util.List;
+import java.util.Objects;
 
 @Service
 public class UserServiceImpl implements UserService {
@@ -39,14 +36,15 @@ public class UserServiceImpl implements UserService {
     @Override
     public void save(User user) {
         String userRole = user.getRole();
-        repository.save(user);
+        repository.save(user); // must save user first to get user id
         Long userId = user.getId();
-        UserLeaveEntitlement userLeaveEntitlement = userLeaveEntitlementRepository.findByUserId(userId);
-        if (!userRole.equals("User") && userLeaveEntitlement == null) { // if user is not a normal user and user leave entitlement is not initialized
+        UserLeaveEntitlement userLeaveEntitlement = userLeaveEntitlementRepository.findByUserId(userId); // check if user leave entitlement is initialized
+        if (userLeaveEntitlement == null) { // if user is not a normal user and user leave entitlement is not initialized
             UserLeaveEntitlement newEntitlement = new UserLeaveEntitlement();
             newEntitlement.setUser(user);
+            String finalUserRole = Objects.equals(userRole, "User") ? "Employee" : userRole; // default entitlement for user is employee
             leaveTypeRepository.findAll().stream().filter(leaveType ->
-                            leaveType.getRoleName().equals(userRole))
+                            leaveType.getRoleName().equals(finalUserRole))
                     .forEach(leaveType -> {
                         int entitledDays = leaveType.getEntitledNum();
                         if(leaveType.getName().equals(LeaveTypeEnum.ANNUAL)){
