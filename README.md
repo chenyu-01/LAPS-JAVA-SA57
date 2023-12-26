@@ -166,4 +166,3 @@ If you encounter any issues, check the following:
 - Verify that the database username and password in `application.properties` are correct.
 - Confirm that the `spring.datasource.url` in `application.properties` correctly points to your MySQL database.
 
-For further assistance, contact your system administrator or seek help from online forums.
