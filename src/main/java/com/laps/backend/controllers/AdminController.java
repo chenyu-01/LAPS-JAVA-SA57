@@ -57,10 +57,16 @@ private final AdminServiceImpl adminService;
                 case "Manager" :
                 case "Employee" :{
                     if (user instanceof Employee) {
-                        Manager manager = adminService.getManagerByName((String) userData.get("authName"));
-                        if (manager == null)
-                            throw new IllegalArgumentException("Manager not found with name: " + userData.get("authName"));
+                        Manager manager;
+                        if (!Objects.equals(userData.get("authName"), null)) {
+                            manager = adminService.getManagerByName((String) userData.get("authName"));
+                            if (manager == null)
+                                throw new IllegalArgumentException("Manager not found with name: " + userData.get("authName"));
+                        }else{
+                            manager = null;
+                        }
                         ((Employee) user).setManager(manager);
+
                     }
                     adminService.updateUser(user);
                     return ResponseEntity.ok().build();
@@ -74,14 +80,18 @@ private final AdminServiceImpl adminService;
 
         user.setRole((String) userData.get("role"));
 
-        //if user is not admin, try to set manager
         if (!user.getRole().equals("Admin")) {
             String manager_name = (String) userData.get("authName");
-            Manager manager = adminService.getManagerByName(manager_name);
+            Manager manager;
+            if (!Objects.equals(manager_name, null)) {
+                manager = adminService.getManagerByName(manager_name);
+                if (manager == null)
+                    throw new IllegalArgumentException("Manager not found with name: " + manager_name);
+            }else
+            {
+                manager = null;
+            }
 
-            if (manager == null)
-                throw new IllegalArgumentException("Manager not found with name: " + manager_name);
-            //
             if (user.getRole().equals("Employee")){
                 Employee employee = new  Employee(user);
                 employee.setManager(manager);
