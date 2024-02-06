@@ -34,6 +34,7 @@ public class UserController {
 
         UserDTO userDTO = new UserDTO(user);
         session.setAttribute("user", userDTO);
+        session.setAttribute("userId", user.getId());
 
 
         // Return the response entity with the cookie
