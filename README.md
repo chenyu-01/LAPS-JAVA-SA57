@@ -75,7 +75,7 @@ _ThymeLeaf Implementation
 
 
 
-REST API
+REST Controller
 
 Admin Controller
 1. /api/admin
@@ -107,21 +107,28 @@ User Controller
 4. /api/users/logout
 5. /api/users/register
 
+
+LeaveEntitlement Controller
+
+1./api/leave-entitlement
+2.api/leave-entitlement/get/{userId}
+
+Controller
 LeaveType Controller
 
 1./leavetype/list
 2./leavetype/editDetails/{id}
-3./publicholidays/list
-4./publicholidays/create
-5./publicholidays/edit/{id}
-6./publicholidays/delete/{id}
+
+Public Holiday Controller
+
+1./publicholidays/list
+2./publicholidays/create
+3./publicholidays/edit/{id}
+4./publicholidays/delete/{id}
 
 Role Controller
-1. /admin/role/list
 
-LeaveEntitlement Controller
-1./api/leave-entitlement
-2.api/leave-entitlement/get/{userId}
+1. /admin/role/list
 
 
 
